@@ -52,10 +52,11 @@
     - Add seed management for reproducible data generation
     - _Requirements: 6.2, 6.3, 7.1, 7.2_
 
-- [-] 3. task 3
+- [x] 3. task 3
 
 
-    - [-] 3.1 Create SalesDataset generator class
+    - [x] 3.1 Create SalesDataset generator class
+
 
     - Implement SalesDataset class inheriting from BaseDataset
     - Generate all 27 required columns with proper data types and formats
@@ -64,15 +65,19 @@
     - Implement product_id generation using "PROD-AAANNN" format
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-    - [ ] 3.2 Implement sales data calculations and relationships
+
+    - [x] 3.2 Implement sales data calculations and relationships
+
     - Calculate total_price as quantity × unit_price
     - Calculate final_price as total_price - discount
     - Calculate profit as 10-30% of final_price
     - Ensure ship_date is order_date + 1-7 days
     - Ensure delivery_date is ship_date + 2-14 days
+
     - _Requirements: 5.5, 5.6, 5.7, 5.8, 5.9_
 
-    - [ ] 3.3 Generate realistic sales data categories and attributes
+    - [x] 3.3 Generate realistic sales data categories and attributes
+
     - Create predefined lists for categories, subcategories, and brands
     - Implement realistic product name generation based on categories
     - Generate customer segments, order priorities, and shipping modes
