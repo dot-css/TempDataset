@@ -9,6 +9,11 @@ from .core.utils.data_frame import TempDataFrame
 from .core.io.csv_handler import read_csv as _read_csv
 from .core.io.json_handler import read_json as _read_json
 from .core.datasets.sales import SalesDataset
+from .core.exceptions import (
+    TempDatasetError, DatasetNotFoundError, DataGenerationError,
+    ValidationError, CSVReadError, CSVWriteError, JSONReadError, JSONWriteError,
+    FileOperationError, MemoryError as TempDatasetMemoryError
+)
 
 # Initialize the main generator
 _generator = DataGenerator()
@@ -28,38 +33,15 @@ def tempdataset(dataset_type: str, rows: int = 500):
         TempDataFrame for dataset types, None for file outputs
         
     Raises:
-        ValueError: If dataset_type is invalid or rows is negative
-        TypeError: If parameters are not of expected types
+        ValidationError: If parameters are invalid
+        DatasetNotFoundError: If dataset type is not available
+        DataGenerationError: If data generation fails
+        TempDatasetMemoryError: If memory limits are exceeded
+        CSVWriteError: If CSV file writing fails
+        JSONWriteError: If JSON file writing fails
     """
-    # Parameter validation
-    if not isinstance(dataset_type, str):
-        raise TypeError("dataset_type must be a string")
-    
-    if not isinstance(rows, int):
-        raise TypeError("rows must be an integer")
-    
-    if rows < 0:
-        raise ValueError("rows must be non-negative")
-    
-    if not dataset_type.strip():
-        raise ValueError("dataset_type cannot be empty")
-    
-    # Detect file extensions and validate supported formats
-    if dataset_type.endswith('.csv') or dataset_type.endswith('.json'):
-        # Validate file extension
-        supported_extensions = ['.csv', '.json']
-        extension = '.' + dataset_type.split('.')[-1]
-        if extension not in supported_extensions:
-            raise ValueError(f"Unsupported file format: {extension}. Supported formats: {supported_extensions}")
-    
-    try:
-        return _generator.generate(dataset_type, rows)
-    except Exception as e:
-        # Re-raise with more context if needed
-        if "not found" in str(e):
-            available_datasets = list(_generator.datasets.keys())
-            raise ValueError(f"Dataset type '{dataset_type}' not found. Available types: {available_datasets}") from e
-        raise
+    # Use the generator's validation and error handling
+    return _generator.generate(dataset_type, rows)
 
 
 def read_csv(filename: str) -> TempDataFrame:
@@ -73,29 +55,21 @@ def read_csv(filename: str) -> TempDataFrame:
         TempDataFrame containing the CSV data
         
     Raises:
-        TypeError: If filename is not a string
-        ValueError: If filename is empty
-        FileNotFoundError: If the file doesn't exist
+        ValidationError: If parameters are invalid
         CSVReadError: If the CSV file is malformed or cannot be read
     """
-    # Parameter validation
+    # Validate file extension
     if not isinstance(filename, str):
-        raise TypeError("filename must be a string")
+        raise ValidationError("filename", filename, "string")
     
     if not filename.strip():
-        raise ValueError("filename cannot be empty")
+        raise ValidationError("filename", filename, "non-empty string")
     
-    # Validate file extension
     if not filename.lower().endswith('.csv'):
-        raise ValueError("filename must have .csv extension")
+        raise ValidationError("filename", filename, "filename with .csv extension")
     
-    try:
-        return _read_csv(filename)
-    except Exception as e:
-        # Provide more helpful error messages
-        if isinstance(e, FileNotFoundError):
-            raise FileNotFoundError(f"CSV file not found: {filename}. Please check the file path.") from e
-        raise
+    # Use the CSV handler's validation and error handling
+    return _read_csv(filename)
 
 
 def read_json(filename: str) -> TempDataFrame:
@@ -109,30 +83,38 @@ def read_json(filename: str) -> TempDataFrame:
         TempDataFrame containing the JSON data
         
     Raises:
-        TypeError: If filename is not a string
-        ValueError: If filename is empty
-        FileNotFoundError: If the file doesn't exist
+        ValidationError: If parameters are invalid
         JSONReadError: If the JSON file is malformed or cannot be read
     """
-    # Parameter validation
+    # Validate file extension
     if not isinstance(filename, str):
-        raise TypeError("filename must be a string")
+        raise ValidationError("filename", filename, "string")
     
     if not filename.strip():
-        raise ValueError("filename cannot be empty")
+        raise ValidationError("filename", filename, "non-empty string")
     
-    # Validate file extension
     if not filename.lower().endswith('.json'):
-        raise ValueError("filename must have .json extension")
+        raise ValidationError("filename", filename, "filename with .json extension")
     
-    try:
-        return _read_json(filename)
-    except Exception as e:
-        # Provide more helpful error messages
-        if isinstance(e, FileNotFoundError):
-            raise FileNotFoundError(f"JSON file not found: {filename}. Please check the file path.") from e
-        raise
+    # Use the JSON handler's validation and error handling
+    return _read_json(filename)
+
+
+def get_performance_stats():
+    """
+    Get performance statistics from the data generator.
+    
+    Returns:
+        Dictionary with performance statistics including timing and memory usage
+    """
+    return _generator.get_performance_stats()
+
+
+def reset_performance_stats():
+    """Reset performance monitoring counters."""
+    _generator.memory_monitor.reset()
+    _generator.profiler = _generator.profiler.__class__()
 
 
 __version__ = "0.1.0"
-__all__ = ["tempdataset", "TempDataFrame", "read_csv", "read_json"]
+__all__ = ["tempdataset", "TempDataFrame", "read_csv", "read_json", "get_performance_stats", "reset_performance_stats"]

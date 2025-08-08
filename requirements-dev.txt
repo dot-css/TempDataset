@@ -1,0 +1,22 @@
+# Development dependencies
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-benchmark>=4.0.0
+memory-profiler>=0.60.0
+psutil>=5.9.0
+
+# Code quality
+black>=22.0.0
+flake8>=5.0.0
+mypy>=1.0.0
+
+# Optional enhanced functionality
+faker>=18.0.0
+
+# Documentation (if needed)
+# sphinx>=4.0.0
+# sphinx-rtd-theme>=1.0.0
+
+# Build tools
+build>=0.8.0
+twine>=4.0.0

@@ -8,6 +8,7 @@ import csv
 import json
 import sys
 from typing import List, Dict, Any, Tuple, Union
+from ..exceptions import ValidationError, CSVWriteError, JSONWriteError
 
 
 class TempDataFrame:
@@ -24,7 +25,24 @@ class TempDataFrame:
         Args:
             data: List of dictionaries representing rows
             columns: List of column names
+            
+        Raises:
+            ValidationError: If parameters are invalid
         """
+        # Validate input parameters
+        if not isinstance(data, list):
+            raise ValidationError("data", data, "list of dictionaries")
+        
+        if not isinstance(columns, list):
+            raise ValidationError("columns", columns, "list of strings")
+        
+        if not all(isinstance(col, str) for col in columns):
+            raise ValidationError("columns", columns, "list of strings")
+        
+        # Validate that data contains dictionaries (if not empty)
+        if data and not all(isinstance(row, dict) for row in data):
+            raise ValidationError("data", data, "list of dictionaries")
+        
         self._data = data
         self._columns = columns
     
@@ -37,7 +55,17 @@ class TempDataFrame:
             
         Returns:
             Formatted string representation of the first n rows
+            
+        Raises:
+            ValidationError: If n is not a positive integer
         """
+        # Validate input parameter
+        if not isinstance(n, int):
+            raise ValidationError("n", n, "integer")
+        
+        if n <= 0:
+            raise ValidationError("n", n, "positive integer")
+        
         if not self._data:
             return "Empty DataFrame"
         
@@ -55,7 +83,17 @@ class TempDataFrame:
             
         Returns:
             Formatted string representation of the last n rows
+            
+        Raises:
+            ValidationError: If n is not a positive integer
         """
+        # Validate input parameter
+        if not isinstance(n, int):
+            raise ValidationError("n", n, "integer")
+        
+        if n <= 0:
+            raise ValidationError("n", n, "positive integer")
+        
         if not self._data:
             return "Empty DataFrame"
         
@@ -151,17 +189,39 @@ class TempDataFrame:
         
         Args:
             filename: Path to output CSV file
-        """
-        with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
-            if not self._data:
-                # Write just headers for empty DataFrame
-                writer = csv.writer(csvfile)
-                writer.writerow(self._columns)
-                return
             
-            writer = csv.DictWriter(csvfile, fieldnames=self._columns)
-            writer.writeheader()
-            writer.writerows(self._data)
+        Raises:
+            ValidationError: If filename is invalid
+            CSVWriteError: If CSV writing fails
+        """
+        # Validate input parameter
+        if not isinstance(filename, str):
+            raise ValidationError("filename", filename, "string")
+        
+        if not filename.strip():
+            raise ValidationError("filename", filename, "non-empty string")
+        
+        try:
+            with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
+                if not self._data:
+                    # Write just headers for empty DataFrame
+                    writer = csv.writer(csvfile)
+                    writer.writerow(self._columns)
+                    return
+                
+                writer = csv.DictWriter(csvfile, fieldnames=self._columns)
+                writer.writeheader()
+                writer.writerows(self._data)
+                
+        except PermissionError as e:
+            raise CSVWriteError(filename, e)
+        except OSError as e:
+            raise CSVWriteError(filename, e)
+        except Exception as e:
+            # Catch any other unexpected errors
+            if isinstance(e, (ValidationError, CSVWriteError)):
+                raise  # Re-raise our custom exceptions
+            raise CSVWriteError(filename, e)
     
     def to_json(self, filename: str) -> None:
         """
@@ -169,9 +229,33 @@ class TempDataFrame:
         
         Args:
             filename: Path to output JSON file
+            
+        Raises:
+            ValidationError: If filename is invalid
+            JSONWriteError: If JSON writing fails
         """
-        with open(filename, 'w', encoding='utf-8') as jsonfile:
-            json.dump(self._data, jsonfile, indent=2, default=str)
+        # Validate input parameter
+        if not isinstance(filename, str):
+            raise ValidationError("filename", filename, "string")
+        
+        if not filename.strip():
+            raise ValidationError("filename", filename, "non-empty string")
+        
+        try:
+            with open(filename, 'w', encoding='utf-8') as jsonfile:
+                json.dump(self._data, jsonfile, indent=2, default=str)
+                
+        except PermissionError as e:
+            raise JSONWriteError(filename, e)
+        except OSError as e:
+            raise JSONWriteError(filename, e)
+        except (TypeError, ValueError) as e:
+            raise JSONWriteError(filename, e)
+        except Exception as e:
+            # Catch any other unexpected errors
+            if isinstance(e, (ValidationError, JSONWriteError)):
+                raise  # Re-raise our custom exceptions
+            raise JSONWriteError(filename, e)
     
     def _format_rows(self, rows: List[Dict[str, Any]]) -> str:
         """

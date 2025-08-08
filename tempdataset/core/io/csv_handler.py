@@ -9,21 +9,7 @@ import os
 from typing import List, Dict, Any, Optional, Iterator
 from pathlib import Path
 from ..utils.data_frame import TempDataFrame
-
-
-class CSVError(Exception):
-    """Base exception for CSV operations."""
-    pass
-
-
-class CSVReadError(CSVError):
-    """Exception raised when CSV reading fails."""
-    pass
-
-
-class CSVWriteError(CSVError):
-    """Exception raised when CSV writing fails."""
-    pass
+from ..exceptions import CSVReadError, CSVWriteError, ValidationError
 
 
 def read_csv(filename: str, chunk_size: Optional[int] = None) -> TempDataFrame:
@@ -38,14 +24,25 @@ def read_csv(filename: str, chunk_size: Optional[int] = None) -> TempDataFrame:
         TempDataFrame containing the CSV data
         
     Raises:
-        FileNotFoundError: If the file doesn't exist
+        ValidationError: If parameters are invalid
         CSVReadError: If the CSV file is malformed or cannot be read
     """
+    # Validate input parameters
+    if not isinstance(filename, str):
+        raise ValidationError("filename", filename, "string")
+    
+    if not filename.strip():
+        raise ValidationError("filename", filename, "non-empty string")
+    
+    if chunk_size is not None:
+        if not isinstance(chunk_size, int) or chunk_size <= 0:
+            raise ValidationError("chunk_size", chunk_size, "positive integer or None")
+    
     file_path = Path(filename)
     
     # Check if file exists
     if not file_path.exists():
-        raise FileNotFoundError(f"CSV file not found: {filename}")
+        raise CSVReadError(filename, FileNotFoundError(f"No such file or directory: '{filename}'"))
     
     try:
         data = []
@@ -67,7 +64,7 @@ def read_csv(filename: str, chunk_size: Optional[int] = None) -> TempDataFrame:
             if reader.fieldnames:
                 columns = list(reader.fieldnames)
             else:
-                raise CSVReadError(f"No columns found in CSV file: {filename}")
+                raise CSVReadError(filename, Exception("No columns found - file may be empty or malformed"))
             
             # Read data with optional chunking for large files
             if chunk_size:
@@ -76,16 +73,21 @@ def read_csv(filename: str, chunk_size: Optional[int] = None) -> TempDataFrame:
                 try:
                     data = list(reader)
                 except csv.Error as e:
-                    raise CSVReadError(f"Error reading CSV file {filename}: {str(e)}")
+                    raise CSVReadError(filename, e)
         
         return TempDataFrame(data, columns)
         
     except UnicodeDecodeError as e:
-        raise CSVReadError(f"Encoding error reading CSV file {filename}: {str(e)}")
-    except PermissionError:
-        raise CSVReadError(f"Permission denied reading CSV file: {filename}")
+        raise CSVReadError(filename, e)
+    except PermissionError as e:
+        raise CSVReadError(filename, e)
     except OSError as e:
-        raise CSVReadError(f"OS error reading CSV file {filename}: {str(e)}")
+        raise CSVReadError(filename, e)
+    except Exception as e:
+        # Catch any other unexpected errors
+        if isinstance(e, (ValidationError, CSVReadError)):
+            raise  # Re-raise our custom exceptions
+        raise CSVReadError(filename, e)
 
 
 def _read_csv_chunks(reader: csv.DictReader, chunk_size: int) -> Iterator[Dict[str, Any]]:
@@ -118,10 +120,31 @@ def write_csv(data: List[Dict[str, Any]], filename: str, columns: Optional[List[
         columns: Optional list of column names to specify order
         
     Raises:
+        ValidationError: If parameters are invalid
         CSVWriteError: If writing fails
     """
+    # Validate input parameters
+    if not isinstance(data, list):
+        raise ValidationError("data", data, "list of dictionaries")
+    
+    if not isinstance(filename, str):
+        raise ValidationError("filename", filename, "string")
+    
+    if not filename.strip():
+        raise ValidationError("filename", filename, "non-empty string")
+    
+    if columns is not None:
+        if not isinstance(columns, list):
+            raise ValidationError("columns", columns, "list of strings or None")
+        if not all(isinstance(col, str) for col in columns):
+            raise ValidationError("columns", columns, "list of strings or None")
+    
     if not data:
-        raise CSVWriteError("Cannot write empty data to CSV file")
+        raise CSVWriteError(filename, Exception("Cannot write empty data to CSV file"))
+    
+    # Validate that data contains dictionaries
+    if not all(isinstance(row, dict) for row in data):
+        raise ValidationError("data", data, "list of dictionaries")
     
     file_path = Path(filename)
     
@@ -129,7 +152,7 @@ def write_csv(data: List[Dict[str, Any]], filename: str, columns: Optional[List[
     try:
         file_path.parent.mkdir(parents=True, exist_ok=True)
     except OSError as e:
-        raise CSVWriteError(f"Cannot create directory for CSV file {filename}: {str(e)}")
+        raise CSVWriteError(filename, e)
     
     # Determine columns if not provided
     if columns is None:
@@ -155,12 +178,17 @@ def write_csv(data: List[Dict[str, Any]], filename: str, columns: Optional[List[
                     filtered_row = {col: row.get(col, '') for col in columns}
                     writer.writerow(filtered_row)
                 except csv.Error as e:
-                    raise CSVWriteError(f"Error writing row to CSV file {filename}: {str(e)}")
+                    raise CSVWriteError(filename, e)
                     
-    except PermissionError:
-        raise CSVWriteError(f"Permission denied writing to CSV file: {filename}")
+    except PermissionError as e:
+        raise CSVWriteError(filename, e)
     except OSError as e:
-        raise CSVWriteError(f"OS error writing CSV file {filename}: {str(e)}")
+        raise CSVWriteError(filename, e)
+    except Exception as e:
+        # Catch any other unexpected errors
+        if isinstance(e, (ValidationError, CSVWriteError)):
+            raise  # Re-raise our custom exceptions
+        raise CSVWriteError(filename, e)
 
 
 def write_csv_streaming(data_generator: Iterator[Dict[str, Any]], filename: str, columns: List[str]) -> None:
@@ -173,15 +201,32 @@ def write_csv_streaming(data_generator: Iterator[Dict[str, Any]], filename: str,
         columns: List of column names
         
     Raises:
+        ValidationError: If parameters are invalid
         CSVWriteError: If writing fails
     """
+    # Validate input parameters
+    if not hasattr(data_generator, '__iter__'):
+        raise ValidationError("data_generator", data_generator, "iterator")
+    
+    if not isinstance(filename, str):
+        raise ValidationError("filename", filename, "string")
+    
+    if not filename.strip():
+        raise ValidationError("filename", filename, "non-empty string")
+    
+    if not isinstance(columns, list):
+        raise ValidationError("columns", columns, "list of strings")
+    
+    if not all(isinstance(col, str) for col in columns):
+        raise ValidationError("columns", columns, "list of strings")
+    
     file_path = Path(filename)
     
     # Create directory if it doesn't exist
     try:
         file_path.parent.mkdir(parents=True, exist_ok=True)
     except OSError as e:
-        raise CSVWriteError(f"Cannot create directory for CSV file {filename}: {str(e)}")
+        raise CSVWriteError(filename, e)
     
     try:
         with open(file_path, 'w', encoding='utf-8', newline='') as csvfile:
@@ -203,9 +248,14 @@ def write_csv_streaming(data_generator: Iterator[Dict[str, Any]], filename: str,
                     filtered_row = {col: row.get(col, '') for col in columns}
                     writer.writerow(filtered_row)
                 except csv.Error as e:
-                    raise CSVWriteError(f"Error writing row to CSV file {filename}: {str(e)}")
+                    raise CSVWriteError(filename, e)
                     
-    except PermissionError:
-        raise CSVWriteError(f"Permission denied writing to CSV file: {filename}")
+    except PermissionError as e:
+        raise CSVWriteError(filename, e)
     except OSError as e:
-        raise CSVWriteError(f"OS error writing CSV file {filename}: {str(e)}")
+        raise CSVWriteError(filename, e)
+    except Exception as e:
+        # Catch any other unexpected errors
+        if isinstance(e, (ValidationError, CSVWriteError)):
+            raise  # Re-raise our custom exceptions
+        raise CSVWriteError(filename, e)

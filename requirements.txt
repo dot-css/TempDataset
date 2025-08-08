@@ -1,0 +1,5 @@
+# Core dependencies - none required for basic functionality
+# TempDataset is designed to work with Python standard library only
+
+# Optional dependencies for enhanced functionality:
+# faker>=18.0.0  # For more realistic fake data generation
