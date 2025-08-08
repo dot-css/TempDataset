@@ -12,6 +12,5 @@ recursive-exclude tests *
 recursive-exclude .benchmarks *
 recursive-exclude .git *
 recursive-exclude .pytest_cache *
-recursive-exclude __pycache__ *
-recursive-exclude *.pyc
+recursive-exclude __pycache__ *.pyc
 recursive-exclude .kiro *
