@@ -87,7 +87,7 @@ class TestDatasetGenerationPerformance:
         monitor.start()
         
         # Generate dataset
-        data = tempdataset.tempdataset('sales', rows=rows)
+        data = tempdataset.create_dataset('sales', rows=rows)
         
         metrics = monitor.stop()
         
@@ -119,7 +119,7 @@ class TestDatasetGenerationPerformance:
             monitor = performance_monitor
             monitor.start()
             
-            data = tempdataset.tempdataset('sales', rows=size)
+            data = tempdataset.create_dataset('sales', rows=size)
             metrics = monitor.stop()
             
             results.append({
@@ -161,7 +161,7 @@ class TestFileIOPerformance:
         monitor.start()
         
         # Generate and save to file
-        tempdataset.tempdataset(filename, rows=rows)
+        tempdataset.create_dataset(filename, rows=rows)
         
         metrics = monitor.stop()
         
@@ -185,7 +185,7 @@ class TestFileIOPerformance:
         filename = os.path.join(temp_dir, f"test_data.{file_format}")
         
         # First create the file
-        tempdataset.tempdataset(filename, rows=rows)
+        tempdataset.create_dataset(filename, rows=rows)
         
         # Now test reading performance
         monitor = performance_monitor
@@ -226,7 +226,7 @@ class TestMemoryUsagePatterns:
         monitor.start()
         
         # Generate large dataset
-        data = tempdataset.tempdataset('sales', rows=rows)
+        data = tempdataset.create_dataset('sales', rows=rows)
         
         metrics = monitor.stop()
         
@@ -261,7 +261,7 @@ class TestMemoryUsagePatterns:
         filename = os.path.join(temp_dir, "large_test.csv")
         
         # Generate large file
-        tempdataset.tempdataset(filename, rows=rows)
+        tempdataset.create_dataset(filename, rows=rows)
         
         # Test reading with memory monitoring
         monitor = performance_monitor
@@ -299,7 +299,7 @@ class TestPerformanceRegression:
             monitor = performance_monitor
             monitor.start()
             
-            data = tempdataset.tempdataset('sales', rows=case['rows'])
+            data = tempdataset.create_dataset('sales', rows=case['rows'])
             
             metrics = monitor.stop()
             
@@ -330,24 +330,24 @@ class TestBenchmarks:
     
     def test_benchmark_small_dataset(self, benchmark):
         """Benchmark small dataset generation."""
-        result = benchmark(tempdataset.tempdataset, 'sales', 1000)
+        result = benchmark(tempdataset.create_dataset, 'sales', 1000)
         assert result.shape[0] == 1000
     
     def test_benchmark_medium_dataset(self, benchmark):
         """Benchmark medium dataset generation."""
-        result = benchmark(tempdataset.tempdataset, 'sales', 10000)
+        result = benchmark(tempdataset.create_dataset, 'sales', 10000)
         assert result.shape[0] == 10000
     
     def test_benchmark_csv_write(self, benchmark, temp_dir):
         """Benchmark CSV file writing."""
         filename = os.path.join(temp_dir, "benchmark.csv")
-        benchmark(tempdataset.tempdataset, filename, 5000)
+        benchmark(tempdataset.create_dataset, filename, 5000)
         assert os.path.exists(filename)
     
     def test_benchmark_csv_read(self, benchmark, temp_dir):
         """Benchmark CSV file reading."""
         filename = os.path.join(temp_dir, "benchmark.csv")
-        tempdataset.tempdataset(filename, 5000)  # Create file first
+        tempdataset.create_dataset(filename, 5000)  # Create file first
         
         result = benchmark(tempdataset.read_csv, filename)
         assert result.shape[0] == 5000
@@ -362,7 +362,7 @@ if __name__ == "__main__":
     # Test 10K rows generation
     print("\nTesting 10K rows generation...")
     monitor.start()
-    data = tempdataset.tempdataset('sales', 10000)
+    data = tempdataset.create_dataset('sales', 10000)
     metrics = monitor.stop()
     
     print(f"Duration: {metrics['duration']:.2f} seconds")

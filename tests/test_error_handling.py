@@ -26,13 +26,13 @@ class TestValidationErrors:
         """Test ValidationError for invalid dataset_type parameter."""
         # Test non-string dataset_type
         with pytest.raises(ValidationError) as exc_info:
-            tempdataset.tempdataset(123)
+            tempdataset.create_dataset(123)
         assert "dataset_type" in str(exc_info.value)
         assert "string" in str(exc_info.value)
         
         # Test empty dataset_type
         with pytest.raises(ValidationError) as exc_info:
-            tempdataset.tempdataset("")
+            tempdataset.create_dataset("")
         assert "dataset_type" in str(exc_info.value)
         assert "non-empty string" in str(exc_info.value)
     
@@ -40,13 +40,13 @@ class TestValidationErrors:
         """Test ValidationError for invalid rows parameter."""
         # Test non-integer rows
         with pytest.raises(ValidationError) as exc_info:
-            tempdataset.tempdataset("sales", rows="100")
+            tempdataset.create_dataset("sales", rows="100")
         assert "rows" in str(exc_info.value)
         assert "integer" in str(exc_info.value)
         
         # Test negative rows
         with pytest.raises(ValidationError) as exc_info:
-            tempdataset.tempdataset("sales", rows=-5)
+            tempdataset.create_dataset("sales", rows=-5)
         assert "rows" in str(exc_info.value)
         assert "non-negative integer" in str(exc_info.value)
     
@@ -145,7 +145,7 @@ class TestDatasetNotFoundError:
     def test_invalid_dataset_type(self):
         """Test DatasetNotFoundError for unknown dataset types."""
         with pytest.raises(DatasetNotFoundError) as exc_info:
-            tempdataset.tempdataset("unknown_dataset")
+            tempdataset.create_dataset("unknown_dataset")
         
         error = exc_info.value
         assert error.dataset_type == "unknown_dataset"
@@ -218,7 +218,7 @@ class TestMemoryError:
         # Try to generate a dataset that would exceed memory limits
         # This should trigger the memory check in the generator
         with pytest.raises(TempDatasetMemoryError) as exc_info:
-            tempdataset.tempdataset("sales", rows=1000000)  # 1 million rows
+            tempdataset.create_dataset("sales", rows=1000000)  # 1 million rows
         
         error = exc_info.value
         assert error.requested_rows == 1000000
@@ -233,19 +233,19 @@ class TestErrorMessages:
         """Test that ValidationError provides helpful suggestions."""
         # Test rows parameter suggestion
         with pytest.raises(ValidationError) as exc_info:
-            tempdataset.tempdataset("sales", rows=-1)
+            tempdataset.create_dataset("sales", rows=-1)
         assert "positive integer" in str(exc_info.value)
         assert "rows=1000" in str(exc_info.value)
         
         # Test dataset_type parameter suggestion
         with pytest.raises(ValidationError) as exc_info:
-            tempdataset.tempdataset("")
+            tempdataset.create_dataset("")
         assert "dataset name" in str(exc_info.value) or "filename" in str(exc_info.value)
     
     def test_dataset_not_found_suggestions(self):
         """Test that DatasetNotFoundError provides helpful suggestions."""
         with pytest.raises(DatasetNotFoundError) as exc_info:
-            tempdataset.tempdataset("invalid")
+            tempdataset.create_dataset("invalid")
         
         error_msg = str(exc_info.value)
         assert "not found" in error_msg
@@ -266,7 +266,7 @@ class TestErrorMessages:
     def test_memory_error_suggestions(self):
         """Test that MemoryError provides helpful suggestions."""
         with pytest.raises(TempDatasetMemoryError) as exc_info:
-            tempdataset.tempdataset("sales", rows=1000000)
+            tempdataset.create_dataset("sales", rows=1000000)
         
         error_msg = str(exc_info.value)
         assert "suggestions" in error_msg.lower()
@@ -282,12 +282,12 @@ class TestErrorHierarchy:
         """Test that all custom exceptions inherit from TempDatasetError."""
         # Test that specific exceptions are instances of base exception
         try:
-            tempdataset.tempdataset("invalid")
+            tempdataset.create_dataset("invalid")
         except DatasetNotFoundError as e:
             assert isinstance(e, TempDatasetError)
         
         try:
-            tempdataset.tempdataset("sales", rows=-1)
+            tempdataset.create_dataset("sales", rows=-1)
         except ValidationError as e:
             assert isinstance(e, TempDatasetError)
         

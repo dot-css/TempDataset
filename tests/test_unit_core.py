@@ -351,7 +351,7 @@ class TestMainAPIIntegration:
     def test_tempdataset_function_basic(self):
         """Test basic tempdataset() function usage."""
         # Test dataset generation
-        df = tempdataset.tempdataset('sales', rows=5)
+        df = tempdataset.create_dataset('sales', rows=5)
         assert isinstance(df, TempDataFrame)
         assert df.shape[0] == 5  # 5 rows
         assert df.shape[1] > 0   # Has columns
@@ -366,13 +366,13 @@ class TestMainAPIIntegration:
         
         try:
             # Test CSV output
-            result = tempdataset.tempdataset(temp_csv, rows=3)
-            assert result is None  # File output returns None
+            result = tempdataset.create_dataset(temp_csv, rows=3)
+            assert isinstance(result, TempDataFrame)  # Now returns TempDataFrame
             assert os.path.exists(temp_csv)
             
             # Test JSON output
-            result = tempdataset.tempdataset(temp_json, rows=3)
-            assert result is None  # File output returns None
+            result = tempdataset.create_dataset(temp_json, rows=3)
+            assert isinstance(result, TempDataFrame)  # Now returns TempDataFrame
             assert os.path.exists(temp_json)
             
         finally:

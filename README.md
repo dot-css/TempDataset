@@ -35,14 +35,14 @@ pip install tempdataset[faker]
 import tempdataset
 
 # Generate 1000 rows of sales data
-data = tempdataset.tempdataset('sales', 1000)
+data = tempdataset.create_dataset('sales', 1000)
 print(data.head())
 
 # Save directly to CSV
-tempdataset.tempdataset('sales.csv', 500)
+tempdataset.create_dataset('sales.csv', 500)
 
 # Save directly to JSON
-tempdataset.tempdataset('sales.json', 500)
+tempdataset.create_dataset('sales.json', 500)
 
 # Read data back
 csv_data = tempdataset.read_csv('sales.csv')
@@ -62,7 +62,7 @@ Generates realistic sales transaction data with:
 
 ```python
 # Generate sales data
-sales_data = tempdataset.tempdataset('sales', 1000)
+sales_data = tempdataset.create_dataset('sales', 1000)
 
 # Access data
 print(f"Generated {len(sales_data)} rows")
@@ -75,7 +75,7 @@ print(f"Memory usage: {sales_data.memory_usage()}")
 ### Working with TempDataFrame
 
 ```python
-data = tempdataset.tempdataset('sales', 1000)
+data = tempdataset.create_dataset('sales', 1000)
 
 # Basic operations
 print(data.head(10))          # First 10 rows
@@ -99,7 +99,7 @@ data.to_dict()                # Convert to dictionary
 import tempdataset
 
 # Generate data
-data = tempdataset.tempdataset('sales', 10000)
+data = tempdataset.create_dataset('sales', 10000)
 
 # Check performance stats
 stats = tempdataset.get_performance_stats()
@@ -164,7 +164,7 @@ mypy tempdataset
 
 ### Core Functions
 
-#### `tempdataset(dataset_type, rows=500)`
+#### `create_dataset(dataset_type, rows=500)`
 Generate temporary datasets or save to files.
 
 **Parameters:**
@@ -172,7 +172,7 @@ Generate temporary datasets or save to files.
 - `rows` (int): Number of rows to generate (default: 500)
 
 **Returns:**
-- `TempDataFrame` for dataset types, `None` for file outputs
+- `TempDataFrame` containing the generated data (also saves to file if filename provided)
 
 #### `read_csv(filename)`
 Read CSV file into TempDataFrame.

@@ -32,10 +32,10 @@ class TestEndToEndDatasetGeneration:
         
         try:
             # Generate dataset and save to CSV
-            result = tempdataset.tempdataset(temp_file, rows=10)
+            result = tempdataset.create_dataset(temp_file, rows=10)
             
-            # Verify function returns None for file output
-            assert result is None
+            # Verify function returns TempDataFrame for file output
+            assert isinstance(result, TempDataFrame)
             
             # Verify file was created
             assert os.path.exists(temp_file)
@@ -72,10 +72,10 @@ class TestEndToEndDatasetGeneration:
         
         try:
             # Generate dataset and save to JSON
-            result = tempdataset.tempdataset(temp_file, rows=5)
+            result = tempdataset.create_dataset(temp_file, rows=5)
             
-            # Verify function returns None for file output
-            assert result is None
+            # Verify function returns TempDataFrame for file output
+            assert isinstance(result, TempDataFrame)
             
             # Verify file was created
             assert os.path.exists(temp_file)
@@ -109,7 +109,7 @@ class TestEndToEndDatasetGeneration:
     def test_dataset_generation_memory_workflow(self):
         """Test complete workflow: generate dataset -> return TempDataFrame -> verify data."""
         # Generate dataset in memory
-        df = tempdataset.tempdataset('sales', rows=20)
+        df = tempdataset.create_dataset('sales', rows=20)
         
         # Verify return type
         assert isinstance(df, TempDataFrame)
@@ -145,7 +145,7 @@ class TestEndToEndDatasetGeneration:
         test_counts = [1, 5, 50, 100]
         
         for count in test_counts:
-            df = tempdataset.tempdataset('sales', rows=count)
+            df = tempdataset.create_dataset('sales', rows=count)
             assert isinstance(df, TempDataFrame)
             assert df.shape[0] == count
             assert df.shape[1] == 30  # Column count should be consistent
@@ -162,7 +162,7 @@ class TestFileRoundTripIntegrity:
     def test_csv_roundtrip_integrity(self):
         """Test CSV save/load cycle maintains data integrity."""
         # Generate original dataset
-        original_df = tempdataset.tempdataset('sales', rows=10)
+        original_df = tempdataset.create_dataset('sales', rows=10)
         
         with tempfile.NamedTemporaryFile(suffix='.csv', delete=False) as f:
             temp_file = f.name
@@ -201,7 +201,7 @@ class TestFileRoundTripIntegrity:
     def test_json_roundtrip_integrity(self):
         """Test JSON save/load cycle maintains data integrity."""
         # Generate original dataset
-        original_df = tempdataset.tempdataset('sales', rows=8)
+        original_df = tempdataset.create_dataset('sales', rows=8)
         
         with tempfile.NamedTemporaryFile(suffix='.json', delete=False) as f:
             temp_file = f.name
@@ -245,7 +245,7 @@ class TestFileRoundTripIntegrity:
     def test_multiple_save_load_cycles(self):
         """Test multiple save/load cycles don't degrade data."""
         # Start with original dataset
-        df = tempdataset.tempdataset('sales', rows=5)
+        df = tempdataset.create_dataset('sales', rows=5)
         original_data = df._data.copy()
         
         # Perform multiple JSON save/load cycles
@@ -280,13 +280,13 @@ class TestFileRoundTripIntegrity:
         
         try:
             # Generate dataset directly to file
-            tempdataset.tempdataset(temp_file, rows=10)
+            tempdataset.create_dataset(temp_file, rows=10)
             
             # Load the file
             file_df = tempdataset.read_json(temp_file)
             
             # Generate equivalent dataset in memory
-            memory_df = tempdataset.tempdataset('sales', rows=10)
+            memory_df = tempdataset.create_dataset('sales', rows=10)
             
             # Both should have same structure
             assert file_df.shape == memory_df.shape
@@ -320,7 +320,7 @@ class TestErrorScenariosAndRecovery:
     def test_invalid_dataset_type_error_recovery(self):
         """Test error handling for invalid dataset types."""
         with pytest.raises(DatasetNotFoundError) as exc_info:
-            tempdataset.tempdataset('invalid_dataset_type')
+            tempdataset.create_dataset('invalid_dataset_type')
         
         error = exc_info.value
         assert error.dataset_type == 'invalid_dataset_type'
@@ -331,16 +331,16 @@ class TestErrorScenariosAndRecovery:
         """Test error handling for invalid parameters."""
         # Test invalid rows parameter
         with pytest.raises(ValidationError) as exc_info:
-            tempdataset.tempdataset('sales', rows=-1)
+            tempdataset.create_dataset('sales', rows=-1)
         assert 'rows' in str(exc_info.value)
         
         with pytest.raises(ValidationError) as exc_info:
-            tempdataset.tempdataset('sales', rows='invalid')
+            tempdataset.create_dataset('sales', rows='invalid')
         assert 'rows' in str(exc_info.value)
         
         # Test invalid dataset_type parameter
         with pytest.raises(ValidationError) as exc_info:
-            tempdataset.tempdataset(123)
+            tempdataset.create_dataset(123)
         assert 'dataset_type' in str(exc_info.value)
     
     def test_file_read_error_recovery(self):
@@ -402,7 +402,7 @@ class TestErrorScenariosAndRecovery:
     def test_empty_dataset_handling(self):
         """Test handling of empty datasets."""
         # Generate empty dataset
-        df = tempdataset.tempdataset('sales', rows=0)
+        df = tempdataset.create_dataset('sales', rows=0)
         
         assert isinstance(df, TempDataFrame)
         assert df.shape == (0, 30)  # 0 rows, but still has columns
@@ -431,7 +431,7 @@ class TestErrorScenariosAndRecovery:
     def test_large_dataset_handling(self):
         """Test handling of reasonably large datasets."""
         # Test with a moderately large dataset (not too large to avoid memory issues)
-        df = tempdataset.tempdataset('sales', rows=1000)
+        df = tempdataset.create_dataset('sales', rows=1000)
         
         assert isinstance(df, TempDataFrame)
         assert df.shape == (1000, 30)
@@ -471,7 +471,7 @@ class TestCrossFormatCompatibility:
     def test_csv_to_json_conversion(self):
         """Test converting data from CSV to JSON format."""
         # Generate dataset and save as CSV
-        original_df = tempdataset.tempdataset('sales', rows=5)
+        original_df = tempdataset.create_dataset('sales', rows=5)
         
         with tempfile.NamedTemporaryFile(suffix='.csv', delete=False) as f:
             csv_file = f.name
@@ -514,7 +514,7 @@ class TestCrossFormatCompatibility:
     def test_json_to_csv_conversion(self):
         """Test converting data from JSON to CSV format."""
         # Generate dataset and save as JSON
-        original_df = tempdataset.tempdataset('sales', rows=5)
+        original_df = tempdataset.create_dataset('sales', rows=5)
         
         with tempfile.NamedTemporaryFile(suffix='.json', delete=False) as f:
             json_file = f.name

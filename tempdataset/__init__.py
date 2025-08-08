@@ -21,7 +21,7 @@ _generator = DataGenerator()
 # Register available datasets
 _generator.register_dataset('sales', SalesDataset)
 
-def tempdataset(dataset_type: str, rows: int = 500):
+def create_dataset(dataset_type: str, rows: int = 500):
     """
     Generate temporary datasets or save to files.
     
@@ -117,4 +117,4 @@ def reset_performance_stats():
 
 
 __version__ = "0.1.0"
-__all__ = ["tempdataset", "TempDataFrame", "read_csv", "read_json", "get_performance_stats", "reset_performance_stats"]
+__all__ = ["create_dataset", "TempDataFrame", "read_csv", "read_json", "get_performance_stats", "reset_performance_stats"]
