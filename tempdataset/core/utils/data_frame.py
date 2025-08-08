@@ -46,6 +46,15 @@ class TempDataFrame:
         self._data = data
         self._columns = columns
     
+    def __len__(self) -> int:
+        """
+        Return the number of rows in the DataFrame.
+        
+        Returns:
+            Number of rows
+        """
+        return len(self._data)
+    
     def head(self, n: int = 5) -> str:
         """
         Display first n rows in a readable format.
@@ -346,6 +355,32 @@ class TempDataFrame:
             return f"{total_bytes / 1024:.1f} KB"
         else:
             return f"{total_bytes / (1024 * 1024):.1f} MB"
+    
+    def memory_usage(self) -> float:
+        """
+        Get memory usage in megabytes.
+        
+        Returns:
+            Memory usage in MB as a float
+        """
+        if not self._data:
+            return 0.0
+        
+        # Rough estimation based on Python object sizes
+        total_bytes = 0
+        
+        # Base object overhead
+        total_bytes += sys.getsizeof(self._data)
+        total_bytes += sys.getsizeof(self._columns)
+        
+        # Data content
+        for row in self._data:
+            total_bytes += sys.getsizeof(row)
+            for value in row.values():
+                total_bytes += sys.getsizeof(value)
+        
+        # Return as MB
+        return total_bytes / (1024 * 1024)
     
     def _get_dtype_counts(self) -> str:
         """

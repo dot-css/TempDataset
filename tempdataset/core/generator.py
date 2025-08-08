@@ -391,10 +391,15 @@ class DataGenerator:
             import faker
             return True
         except ImportError:
-            warnings.warn(
-                "Faker library not found. Using basic random data generation. "
-                "Install faker for more realistic data: pip install faker",
-                category=DependencyWarning,
-                stacklevel=2
-            )
             return False
+    
+    def _warn_faker_missing(self) -> None:
+        """
+        Show warning about missing Faker library when actually needed.
+        """
+        warnings.warn(
+            "Faker library not found. Using basic random data generation. "
+            "Install faker for more realistic data: pip install faker",
+            category=DependencyWarning,
+            stacklevel=3
+        )
