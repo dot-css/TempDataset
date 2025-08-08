@@ -3,7 +3,6 @@
 [![PyPI version](https://badge.fury.io/py/tempdataset.svg)](https://badge.fury.io/py/tempdataset)
 [![Python Support](https://img.shields.io/pypi/pyversions/tempdataset.svg)](https://pypi.org/project/tempdataset/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://github.com/dot-css/TempDataset/workflows/Tests/badge.svg)](https://github.com/dot-css/TempDataset/actions)
 
 A lightweight Python library for generating realistic temporary datasets for testing and development. No heavy dependencies required - works with just the Python standard library!
 
