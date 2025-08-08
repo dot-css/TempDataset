@@ -65,7 +65,7 @@ class DataGenerator:
         
         self.datasets[name] = dataset_class
     
-    def generate(self, dataset_type: str, rows: int = 500) -> Union[TempDataFrame, None]:
+    def generate(self, dataset_type: str, rows: int = 500) -> TempDataFrame:
         """
         Generate dataset using registered generators.
         
@@ -74,7 +74,7 @@ class DataGenerator:
             rows: Number of rows to generate
             
         Returns:
-            TempDataFrame for dataset types, None for file outputs
+            TempDataFrame containing the generated data (also saves to file if filename provided)
             
         Raises:
             ValidationError: If parameters are invalid
@@ -146,13 +146,16 @@ class DataGenerator:
                 rows
             ) from e
     
-    def _generate_to_file(self, filename: str, rows: int) -> None:
+    def _generate_to_file(self, filename: str, rows: int) -> TempDataFrame:
         """
         Generate dataset and save to file.
         
         Args:
             filename: Output filename with extension
             rows: Number of rows to generate
+            
+        Returns:
+            TempDataFrame containing the generated data
             
         Raises:
             ValidationError: If filename format is invalid
@@ -197,15 +200,52 @@ class DataGenerator:
             # Use streaming for very large datasets to avoid memory issues
             if optimization_settings["use_streaming"]:
                 self._generate_streaming_to_file(dataset_type, rows, filename)
+                # For streaming, we need to read the file back to return a DataFrame
+                # This is not ideal for very large files, but maintains API consistency
+                if extension == '.csv':
+                    from .io.csv_handler import read_csv
+                    return read_csv(filename)
+                elif extension == '.json':
+                    from .io.json_handler import read_json
+                    return read_json(filename)
             else:
-                # Generate the data in memory first
-                temp_df = self.generate(dataset_type, rows)
+                # Generate the data in memory first by calling the core generation logic directly
+                if dataset_type not in self.datasets:
+                    available = list(self.datasets.keys())
+                    raise DatasetNotFoundError(dataset_type, available)
+                
+                # Start performance profiling
+                self.profiler.start_operation("data_generation")
+                
+                # Use optimized generation for large datasets
+                if optimization_settings["use_batching"]:
+                    data = self._generate_with_batching(dataset_type, rows, optimization_settings)
+                else:
+                    data = self._generate_standard(dataset_type, rows, optimization_settings)
+                
+                # End performance profiling
+                generation_time = self.profiler.end_operation("data_generation")
+                
+                # Log performance info for large datasets
+                if optimization_settings["show_progress"]:
+                    print(f"\nGeneration completed in {generation_time:.2f}s ({rows/generation_time:.0f} rows/sec)")
+                
+                # Get schema from dataset class
+                dataset_class = self.datasets[dataset_type]
+                temp_dataset = dataset_class(1)  # Create temporary instance for schema
+                schema = temp_dataset.get_schema()
+                columns = list(schema.keys())
+                
+                # Create TempDataFrame
+                temp_df = TempDataFrame(data, columns)
                 
                 # Save to appropriate format
                 if extension == '.csv':
                     temp_df.to_csv(filename)
                 elif extension == '.json':
                     temp_df.to_json(filename)
+                
+                return temp_df
                 
         except Exception as e:
             if isinstance(e, (ValidationError, DatasetNotFoundError, TempDatasetMemoryError)):

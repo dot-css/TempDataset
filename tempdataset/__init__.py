@@ -30,7 +30,7 @@ def tempdataset(dataset_type: str, rows: int = 500):
         rows: Number of rows to generate (default: 500)
         
     Returns:
-        TempDataFrame for dataset types, None for file outputs
+        TempDataFrame containing the generated data (also saves to file if filename provided)
         
     Raises:
         ValidationError: If parameters are invalid
