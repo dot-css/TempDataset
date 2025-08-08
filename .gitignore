@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 *$py.class
+# Add to .gitignore
+.pypirc
 
 # C extensions
 *.so

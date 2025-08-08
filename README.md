@@ -23,9 +23,8 @@ A lightweight Python library for generating realistic temporary datasets for tes
 pip install tempdataset
 ```
 
-For additional features with Faker support:
 ```bash
-pip install tempdataset[faker]
+pip install git+https://github.com/dot-css/TempDataset
 ```
 
 ### Basic Usage
