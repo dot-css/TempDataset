@@ -11,6 +11,8 @@ from .core.io.json_handler import read_json as _read_json
 from .core.datasets.sales import SalesDataset
 from .core.datasets.customers import CustomersDataset
 from .core.datasets.ecommerce import EcommerceDataset
+from .core.datasets.employees import EmployeesDataset
+from .core.datasets.marketing import MarketingDataset
 from .core.exceptions import (
     TempDatasetError, DatasetNotFoundError, DataGenerationError,
     ValidationError, CSVReadError, CSVWriteError, JSONReadError, JSONWriteError,
@@ -24,13 +26,15 @@ _generator = DataGenerator()
 _generator.register_dataset('sales', SalesDataset)
 _generator.register_dataset('customers', CustomersDataset)
 _generator.register_dataset('ecommerce', EcommerceDataset)
+_generator.register_dataset('employees', EmployeesDataset)
+_generator.register_dataset('marketing', MarketingDataset)
 
 def create_dataset(dataset_type: str, rows: int = 500):
     """
     Generate temporary datasets or save to files.
     
     Args:
-        dataset_type: Dataset type ('sales', 'customers', 'ecommerce') or filename ('sales.csv', 'customers.json', 'ecommerce.json')
+        dataset_type: Dataset type ('sales', 'customers', 'ecommerce', 'employees', 'marketing') or filename ('sales.csv', 'customers.json', 'ecommerce.json', 'employees.csv', 'marketing.csv')
         rows: Number of rows to generate (default: 500)
         
     Returns:
