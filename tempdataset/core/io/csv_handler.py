@@ -72,6 +72,8 @@ def read_csv(filename: str, chunk_size: Optional[int] = None) -> TempDataFrame:
             else:
                 try:
                     data = list(reader)
+                    # Additional validation for malformed CSV
+                    _validate_csv_data(data, columns, filename)
                 except csv.Error as e:
                     raise CSVReadError(filename, e)
         
@@ -88,6 +90,37 @@ def read_csv(filename: str, chunk_size: Optional[int] = None) -> TempDataFrame:
         if isinstance(e, (ValidationError, CSVReadError)):
             raise  # Re-raise our custom exceptions
         raise CSVReadError(filename, e)
+
+
+def _validate_csv_data(data: List[Dict[str, Any]], columns: List[str], filename: str) -> None:
+    """
+    Validate CSV data for common malformation issues.
+    
+    Args:
+        data: List of dictionaries containing the CSV data
+        columns: List of expected column names
+        filename: Filename for error reporting
+        
+    Raises:
+        CSVReadError: If malformed data is detected
+    """
+    if not data:
+        return  # Empty data is valid
+    
+    # Check for rows with inconsistent column counts or malformed data
+    for i, row in enumerate(data):
+        if not isinstance(row, dict):
+            raise CSVReadError(filename, Exception(f"Row {i+1} is not properly formatted"))
+        
+        # Check for None keys or values (indicates malformed CSV parsing)
+        if None in row or None in row.values():
+            raise CSVReadError(filename, Exception(f"Row {i+1} contains malformed data - likely unclosed quotes or invalid CSV format"))
+        
+        # Check for unexpected number of fields
+        if len(row) != len(columns):
+            # Allow for some flexibility, but flag obvious issues
+            if len(row) > len(columns) * 1.5:  # More than 50% extra fields
+                raise CSVReadError(filename, Exception(f"Row {i+1} has too many fields - possible malformed CSV"))
 
 
 def _read_csv_chunks(reader: csv.DictReader, chunk_size: int) -> Iterator[Dict[str, Any]]:

@@ -32,7 +32,7 @@ pip install git+https://github.com/dot-css/TempDataset
 ```python
 import tempdataset
 
-# Generate 1000 rows of sales data
+# Generate 1000 rows of any dataset type
 data = tempdataset.create_dataset('sales', 1000)
 data.head()
 
@@ -40,32 +40,95 @@ data.head()
 tempdataset.create_dataset('sales.csv', 500)
 
 # Save directly to JSON
-tempdataset.create_dataset('sales.json', 500)
+tempdataset.create_dataset('customers.json', 500)
 
 # Read data back
 csv_data = tempdataset.read_csv('sales.csv')
-json_data = tempdataset.read_json('sales.json')
+json_data = tempdataset.read_json('customers.json')
+
+# Get help and see all available datasets
+tempdataset.help()          # Comprehensive help
+tempdataset.list_datasets() # Quick dataset overview
 ```
 
 ## Available Datasets
 
-### Sales Dataset
-Generates realistic sales transaction data with:
-- Transaction IDs
-- Customer information
-- Product details
-- Sales amounts and quantities
-- Timestamps
-- Geographic data
+TempDataset provides **7 comprehensive datasets** for various use cases:
 
+### 🛒 Sales Dataset
+Complete sales transaction data with **27 columns**:
 ```python
-# Generate sales data
 sales_data = tempdataset.create_dataset('sales', 1000)
+```
+**Features:** Order information, customer details, product data, financial calculations, geographic data, shipping details
 
-# Access data
-print(f"Generated {len(sales_data)} rows")
-print(f"Columns: {sales_data.columns}")
-print(f"Memory usage: {sales_data.memory_usage()}")
+**Key Columns:** `order_id`, `customer_name`, `product_name`, `category`, `final_price`, `order_date`, `sales_rep`, `region`, `profit`
+
+### 👥 Customers Dataset  
+Comprehensive customer profiles with **31 columns**:
+```python
+customers_data = tempdataset.create_dataset('customers', 1000)
+```
+**Features:** Personal information, demographics, purchase history, loyalty data, account status, preferences
+
+**Key Columns:** `customer_id`, `full_name`, `email`, `age`, `annual_income`, `total_spent`, `loyalty_points`, `account_status`
+
+### 🛍️ E-commerce Dataset
+Advanced e-commerce transaction data with **35+ columns**:
+```python
+ecommerce_data = tempdataset.create_dataset('ecommerce', 1000)
+```
+**Features:** Transaction details, customer behavior, product catalog, reviews, returns, digital metrics, seller information
+
+**Key Columns:** `transaction_id`, `customer_rating`, `seller_rating`, `return_status`, `device_type`, `conversion_rate`
+
+### 👨‍💼 Employees Dataset
+Complete HR and employee management data with **30+ columns**:
+```python
+employees_data = tempdataset.create_dataset('employees', 1000)
+```
+**Features:** Personal info, job details, performance metrics, benefits, skills, department structure
+
+**Key Columns:** `employee_id`, `job_title`, `department`, `salary`, `performance_rating`, `benefits`, `skills`
+
+### 📢 Marketing Dataset
+Marketing campaign performance data with **32+ columns**:
+```python
+marketing_data = tempdataset.create_dataset('marketing', 1000)
+```
+**Features:** Campaign metrics, channel performance, ROI analysis, audience data, conversion tracking
+
+**Key Columns:** `campaign_id`, `channel`, `impressions`, `clicks`, `conversions`, `roi`, `cost_per_click`
+
+### 🏪 Retail Dataset
+In-store retail operations data with **28+ columns**:
+```python
+retail_data = tempdataset.create_dataset('retail', 1000)
+```
+**Features:** Point-of-sale transactions, inventory management, store operations, staff data, seasonal trends
+
+**Key Columns:** `receipt_id`, `store_id`, `product_sku`, `quantity_sold`, `staff_id`, `inventory_level`
+
+### 🏭 Suppliers Dataset
+Supplier and vendor management data with **22+ columns**:
+```python
+suppliers_data = tempdataset.create_dataset('suppliers', 1000)
+```
+**Features:** Supplier profiles, performance metrics, contract management, quality ratings, delivery data
+
+**Key Columns:** `supplier_id`, `company_name`, `quality_rating`, `delivery_performance`, `contract_value`
+
+### Quick Help
+```python
+# Get comprehensive help and examples
+tempdataset.help()
+
+# List all datasets with descriptions  
+tempdataset.list_datasets()
+
+# See specific dataset schema
+data = tempdataset.create_dataset('sales', 10)
+print(data.columns)  # View all column names
 ```
 
 ## Advanced Usage
@@ -166,11 +229,19 @@ mypy tempdataset
 Generate temporary datasets or save to files.
 
 **Parameters:**
-- `dataset_type` (str): Dataset type ('sales') or filename ('sales.csv', 'sales.json')
+- `dataset_type` (str): Dataset type or filename
+  - **Available types:** `'sales'`, `'customers'`, `'ecommerce'`, `'employees'`, `'marketing'`, `'retail'`, `'suppliers'`
+  - **File formats:** `'sales.csv'`, `'customers.json'`, etc.
 - `rows` (int): Number of rows to generate (default: 500)
 
 **Returns:**
 - `TempDataFrame` containing the generated data (also saves to file if filename provided)
+
+#### `help()`
+Display comprehensive help information about all available datasets, including column descriptions, usage examples, and feature details.
+
+#### `list_datasets()`
+Get a quick overview of all available datasets with their key features and column counts.
 
 #### `read_csv(filename)`
 Read CSV file into TempDataFrame.
