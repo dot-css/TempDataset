@@ -23,6 +23,18 @@ class DisplayFormatter:
     def __repr__(self) -> str:
         return self.content
     
+    def __eq__(self, other) -> bool:
+        """Enable comparison with strings for testing."""
+        if isinstance(other, str):
+            return self.content == other
+        elif isinstance(other, DisplayFormatter):
+            return self.content == other.content
+        return False
+    
+    def __contains__(self, item) -> bool:
+        """Enable 'in' operator for string searching."""
+        return item in self.content
+    
     def _repr_html_(self) -> str:
         """HTML representation for Jupyter notebooks."""
         # Convert the text table to a simple HTML table for better display
@@ -99,12 +111,15 @@ class TempDataFrame:
             raise ValidationError("n", n, "positive integer")
         
         if not self._data:
-            return DisplayFormatter("Empty DataFrame")
+            result = DisplayFormatter("Empty DataFrame")
+        else:
+            # Get the first n rows
+            rows_to_show = self._data[:n]
+            result = DisplayFormatter(self._format_rows(rows_to_show))
         
-        # Get the first n rows
-        rows_to_show = self._data[:n]
-        
-        return DisplayFormatter(self._format_rows(rows_to_show))
+        # Auto-print in script context
+        print(result.content)
+        return result
     
     def tail(self, n: int = 5) -> DisplayFormatter:
         """
@@ -127,12 +142,15 @@ class TempDataFrame:
             raise ValidationError("n", n, "positive integer")
         
         if not self._data:
-            return DisplayFormatter("Empty DataFrame")
+            result = DisplayFormatter("Empty DataFrame")
+        else:
+            # Get the last n rows
+            rows_to_show = self._data[-n:]
+            result = DisplayFormatter(self._format_rows(rows_to_show))
         
-        # Get the last n rows
-        rows_to_show = self._data[-n:]
-        
-        return DisplayFormatter(self._format_rows(rows_to_show))
+        # Auto-print in script context
+        print(result.content)
+        return result
     
     @property
     def shape(self) -> Tuple[int, int]:
@@ -162,98 +180,102 @@ class TempDataFrame:
             DisplayFormatter object with statistical summary
         """
         if not self._data:
-            return DisplayFormatter("Empty DataFrame")
-        
-        # Find numeric columns
-        numeric_cols = []
-        for col in self._columns:
-            # Check if column contains numeric data
-            has_numeric = False
-            for row in self._data:
-                value = row.get(col)
-                if value is not None and isinstance(value, (int, float)) and not isinstance(value, bool):
-                    has_numeric = True
-                    break
-            if has_numeric:
-                numeric_cols.append(col)
-        
-        if not numeric_cols:
-            return DisplayFormatter("No numeric columns found")
-        
-        # Calculate statistics for each numeric column
-        stats = {}
-        for col in numeric_cols:
-            values = []
-            for row in self._data:
-                value = row.get(col)
-                if value is not None and isinstance(value, (int, float)) and not isinstance(value, bool):
-                    values.append(float(value))
+            result = DisplayFormatter("Empty DataFrame")
+        else:
+            # Find numeric columns
+            numeric_cols = []
+            for col in self._columns:
+                # Check if column contains numeric data
+                has_numeric = False
+                for row in self._data:
+                    value = row.get(col)
+                    if value is not None and isinstance(value, (int, float)) and not isinstance(value, bool):
+                        has_numeric = True
+                        break
+                if has_numeric:
+                    numeric_cols.append(col)
             
-            if values:
-                values.sort()
-                n = len(values)
+            if not numeric_cols:
+                result = DisplayFormatter("No numeric columns found")
+            else:
+                # Calculate statistics for each numeric column
+                stats = {}
+                for col in numeric_cols:
+                    values = []
+                    for row in self._data:
+                        value = row.get(col)
+                        if value is not None and isinstance(value, (int, float)) and not isinstance(value, bool):
+                            values.append(float(value))
+                    
+                    if values:
+                        values.sort()
+                        n = len(values)
+                        
+                        # Calculate statistics
+                        count = n
+                        mean = sum(values) / n
+                        std = (sum((x - mean) ** 2 for x in values) / (n - 1)) ** 0.5 if n > 1 else 0.0
+                        min_val = min(values)
+                        max_val = max(values)
+                        
+                        # Percentiles
+                        q25_idx = int(n * 0.25)
+                        q50_idx = int(n * 0.50)
+                        q75_idx = int(n * 0.75)
+                        
+                        q25 = values[q25_idx] if q25_idx < n else values[-1]
+                        q50 = values[q50_idx] if q50_idx < n else values[-1]
+                        q75 = values[q75_idx] if q75_idx < n else values[-1]
+                        
+                        stats[col] = {
+                            'count': count,
+                            'mean': mean,
+                            'std': std,
+                            'min': min_val,
+                            '25%': q25,
+                            '50%': q50,
+                            '75%': q75,
+                            'max': max_val
+                        }
                 
-                # Calculate statistics
-                count = n
-                mean = sum(values) / n
-                std = (sum((x - mean) ** 2 for x in values) / (n - 1)) ** 0.5 if n > 1 else 0.0
-                min_val = min(values)
-                max_val = max(values)
-                
-                # Percentiles
-                q25_idx = int(n * 0.25)
-                q50_idx = int(n * 0.50)
-                q75_idx = int(n * 0.75)
-                
-                q25 = values[q25_idx] if q25_idx < n else values[-1]
-                q50 = values[q50_idx] if q50_idx < n else values[-1]
-                q75 = values[q75_idx] if q75_idx < n else values[-1]
-                
-                stats[col] = {
-                    'count': count,
-                    'mean': mean,
-                    'std': std,
-                    'min': min_val,
-                    '25%': q25,
-                    '50%': q50,
-                    '75%': q75,
-                    'max': max_val
-                }
-        
-        if not stats:
-            return DisplayFormatter("No numeric data found")
-        
-        # Format output similar to pandas describe()
-        stat_names = ['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max']
-        
-        # Calculate column widths
-        col_widths = {}
-        for col in numeric_cols:
-            col_widths[col] = max(len(col), 10)  # Minimum width of 10
-        
-        # Create header
-        header_parts = [''.ljust(8)]  # Space for stat names
-        for col in numeric_cols:
-            header_parts.append(col.rjust(col_widths[col]))
-        
-        lines = ['  '.join(header_parts)]
-        
-        # Add statistics rows
-        for stat_name in stat_names:
-            row_parts = [stat_name.ljust(8)]
-            for col in numeric_cols:
-                if col in stats:
-                    value = stats[col][stat_name]
-                    if stat_name == 'count':
-                        formatted_value = f"{int(value)}"
-                    else:
-                        formatted_value = f"{value:.6f}"
-                    row_parts.append(formatted_value.rjust(col_widths[col]))
+                if not stats:
+                    result = DisplayFormatter("No numeric data found")
                 else:
-                    row_parts.append(''.rjust(col_widths[col]))
-            lines.append('  '.join(row_parts))
+                    # Format output similar to pandas describe()
+                    stat_names = ['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max']
+                    
+                    # Calculate column widths
+                    col_widths = {}
+                    for col in numeric_cols:
+                        col_widths[col] = max(len(col), 10)  # Minimum width of 10
+                    
+                    # Create header
+                    header_parts = [''.ljust(8)]  # Space for stat names
+                    for col in numeric_cols:
+                        header_parts.append(col.rjust(col_widths[col]))
+                    
+                    lines = ['  '.join(header_parts)]
+                    
+                    # Add statistics rows
+                    for stat_name in stat_names:
+                        row_parts = [stat_name.ljust(8)]
+                        for col in numeric_cols:
+                            if col in stats:
+                                value = stats[col][stat_name]
+                                if stat_name == 'count':
+                                    formatted_value = f"{int(value)}"
+                                else:
+                                    formatted_value = f"{value:.6f}"
+                                row_parts.append(formatted_value.rjust(col_widths[col]))
+                            else:
+                                row_parts.append(''.rjust(col_widths[col]))
+                        lines.append('  '.join(row_parts))
+                    
+                    result = DisplayFormatter('\n'.join(lines))
         
-        return DisplayFormatter('\n'.join(lines))
+        # Auto-print in script context
+        print(result.content)
+        return result
 
     def info(self) -> DisplayFormatter:
         """
@@ -263,58 +285,62 @@ class TempDataFrame:
             DisplayFormatter object with dataset information
         """
         if not self._data:
-            return DisplayFormatter("Empty DataFrame")
-        
-        rows, cols = self.shape
-        
-        # Calculate column types and non-null counts
-        column_info = []
-        for col in self._columns:
-            non_null_count = sum(1 for row in self._data if row.get(col) is not None)
+            result = DisplayFormatter("Empty DataFrame")
+        else:
+            rows, cols = self.shape
             
-            # Determine data type from first non-null value
-            dtype = "object"
-            for row in self._data:
-                value = row.get(col)
-                if value is not None:
-                    if isinstance(value, int):
-                        dtype = "int64"
-                    elif isinstance(value, float):
-                        dtype = "float64"
-                    elif isinstance(value, bool):
-                        dtype = "bool"
-                    elif isinstance(value, str):
-                        dtype = "object"
-                    break
+            # Calculate column types and non-null counts
+            column_info = []
+            for col in self._columns:
+                non_null_count = sum(1 for row in self._data if row.get(col) is not None)
+                
+                # Determine data type from first non-null value
+                dtype = "object"
+                for row in self._data:
+                    value = row.get(col)
+                    if value is not None:
+                        if isinstance(value, int):
+                            dtype = "int64"
+                        elif isinstance(value, float):
+                            dtype = "float64"
+                        elif isinstance(value, bool):
+                            dtype = "bool"
+                        elif isinstance(value, str):
+                            dtype = "object"
+                        break
+                
+                column_info.append({
+                    'column': col,
+                    'non_null': non_null_count,
+                    'dtype': dtype
+                })
             
-            column_info.append({
-                'column': col,
-                'non_null': non_null_count,
-                'dtype': dtype
-            })
+            # Calculate approximate memory usage
+            memory_usage = self._estimate_memory_usage()
+            
+            # Format output
+            info_lines = [
+                f"<class 'tempdataset.core.utils.data_frame.TempDataFrame'>",
+                f"RangeIndex: {rows} entries, 0 to {rows-1}" if rows > 0 else "RangeIndex: 0 entries",
+                f"Data columns (total {cols} columns):"
+            ]
+            
+            # Add column information
+            info_lines.append(" #   Column" + " " * 15 + "Non-Null Count  Dtype")
+            info_lines.append("---  ------" + " " * 15 + "--------------  -----")
+            
+            for i, col_info in enumerate(column_info):
+                col_name = col_info['column'][:20]  # Truncate long column names
+                info_lines.append(f" {i:<3} {col_name:<20} {col_info['non_null']} non-null    {col_info['dtype']}")
+            
+            info_lines.append(f"dtypes: {self._get_dtype_counts()}")
+            info_lines.append(f"memory usage: {memory_usage}")
+            
+            result = DisplayFormatter("\n".join(info_lines))
         
-        # Calculate approximate memory usage
-        memory_usage = self._estimate_memory_usage()
-        
-        # Format output
-        info_lines = [
-            f"<class 'tempdataset.core.utils.data_frame.TempDataFrame'>",
-            f"RangeIndex: {rows} entries, 0 to {rows-1}" if rows > 0 else "RangeIndex: 0 entries",
-            f"Data columns (total {cols} columns):"
-        ]
-        
-        # Add column information
-        info_lines.append(" #   Column" + " " * 15 + "Non-Null Count  Dtype")
-        info_lines.append("---  ------" + " " * 15 + "--------------  -----")
-        
-        for i, col_info in enumerate(column_info):
-            col_name = col_info['column'][:20]  # Truncate long column names
-            info_lines.append(f" {i:<3} {col_name:<20} {col_info['non_null']} non-null    {col_info['dtype']}")
-        
-        info_lines.append(f"dtypes: {self._get_dtype_counts()}")
-        info_lines.append(f"memory usage: {memory_usage}")
-        
-        return DisplayFormatter("\n".join(info_lines))
+        # Auto-print in script context
+        print(result.content)
+        return result
     
     def to_csv(self, filename: str) -> None:
         """
@@ -505,6 +531,74 @@ class TempDataFrame:
         
         # Return as MB
         return total_bytes / (1024 * 1024)
+    
+    def filter(self, condition_func) -> 'TempDataFrame':
+        """
+        Filter rows based on a condition function.
+        
+        Args:
+            condition_func: Function that takes a row dict and returns True/False
+            
+        Returns:
+            New TempDataFrame with filtered rows
+            
+        Raises:
+            ValidationError: If condition_func is not callable
+        """
+        if not callable(condition_func):
+            raise ValidationError("condition_func", condition_func, "callable function")
+        
+        filtered_data = []
+        for row in self._data:
+            try:
+                if condition_func(row):
+                    filtered_data.append(row.copy())
+            except Exception as e:
+                # Skip rows that cause errors in the condition function
+                continue
+        
+        return TempDataFrame(filtered_data, self._columns.copy())
+    
+    def select(self, columns: List[str]) -> 'TempDataFrame':
+        """
+        Select specific columns from the DataFrame.
+        
+        Args:
+            columns: List of column names to select
+            
+        Returns:
+            New TempDataFrame with selected columns only
+            
+        Raises:
+            ValidationError: If columns parameter is invalid or contains non-existent columns
+        """
+        if not isinstance(columns, list):
+            raise ValidationError("columns", columns, "list of strings")
+        
+        if not all(isinstance(col, str) for col in columns):
+            raise ValidationError("columns", columns, "list of strings")
+        
+        # Check if all requested columns exist
+        missing_cols = [col for col in columns if col not in self._columns]
+        if missing_cols:
+            raise ValidationError("columns", missing_cols, f"columns that exist in DataFrame. Available columns: {self._columns}")
+        
+        # Create new data with only selected columns
+        selected_data = []
+        for row in self._data:
+            selected_row = {col: row.get(col) for col in columns}
+            selected_data.append(selected_row)
+        
+        return TempDataFrame(selected_data, columns.copy())
+    
+    def to_dict(self) -> List[Dict[str, Any]]:
+        """
+        Convert DataFrame to list of dictionaries.
+        
+        Returns:
+            List of dictionaries representing the data
+        """
+        return [row.copy() for row in self._data]
     
     def _get_dtype_counts(self) -> str:
         """
