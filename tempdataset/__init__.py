@@ -9,6 +9,8 @@ from .core.utils.data_frame import TempDataFrame
 from .core.io.csv_handler import read_csv as _read_csv
 from .core.io.json_handler import read_json as _read_json
 from .core.datasets.sales import SalesDataset
+from .core.datasets.customers import CustomersDataset
+from .core.datasets.ecommerce import EcommerceDataset
 from .core.exceptions import (
     TempDatasetError, DatasetNotFoundError, DataGenerationError,
     ValidationError, CSVReadError, CSVWriteError, JSONReadError, JSONWriteError,
@@ -20,13 +22,15 @@ _generator = DataGenerator()
 
 # Register available datasets
 _generator.register_dataset('sales', SalesDataset)
+_generator.register_dataset('customers', CustomersDataset)
+_generator.register_dataset('ecommerce', EcommerceDataset)
 
 def create_dataset(dataset_type: str, rows: int = 500):
     """
     Generate temporary datasets or save to files.
     
     Args:
-        dataset_type: Dataset type ('sales') or filename ('sales.csv', 'sales.json')
+        dataset_type: Dataset type ('sales', 'customers', 'ecommerce') or filename ('sales.csv', 'customers.json', 'ecommerce.json')
         rows: Number of rows to generate (default: 500)
         
     Returns:
@@ -117,4 +121,8 @@ def reset_performance_stats():
 
 
 __version__ = "0.1.0"
-__all__ = ["create_dataset", "TempDataFrame", "read_csv", "read_json", "get_performance_stats", "reset_performance_stats"]
+
+# Alias for convenience (matches the library name)
+tempdataset = create_dataset
+
+__all__ = ["create_dataset", "tempdataset", "TempDataFrame", "read_csv", "read_json", "get_performance_stats", "reset_performance_stats"]

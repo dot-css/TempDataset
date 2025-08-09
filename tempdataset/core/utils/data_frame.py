@@ -11,6 +11,29 @@ from typing import List, Dict, Any, Tuple, Union
 from ..exceptions import ValidationError, CSVWriteError, JSONWriteError
 
 
+class DisplayFormatter:
+    """Helper class to format output for Jupyter/Colab display."""
+    
+    def __init__(self, content: str):
+        self.content = content
+    
+    def __str__(self) -> str:
+        return self.content
+    
+    def __repr__(self) -> str:
+        return self.content
+    
+    def _repr_html_(self) -> str:
+        """HTML representation for Jupyter notebooks."""
+        # Convert the text table to a simple HTML table for better display
+        lines = self.content.split('\n')
+        if not lines:
+            return f"<pre>{self.content}</pre>"
+        
+        # For simple text formatting, just use <pre> tag to preserve spacing
+        return f"<pre style='font-family: monospace; white-space: pre;'>{self.content}</pre>"
+
+
 class TempDataFrame:
     """
     Lightweight DataFrame-like class for data manipulation and exploration.
@@ -55,7 +78,7 @@ class TempDataFrame:
         """
         return len(self._data)
     
-    def head(self, n: int = 5) -> str:
+    def head(self, n: int = 5) -> DisplayFormatter:
         """
         Display first n rows in a readable format.
         
@@ -63,7 +86,7 @@ class TempDataFrame:
             n: Number of rows to display (default: 5)
             
         Returns:
-            Formatted string representation of the first n rows
+            DisplayFormatter object with formatted representation of the first n rows
             
         Raises:
             ValidationError: If n is not a positive integer
@@ -76,14 +99,14 @@ class TempDataFrame:
             raise ValidationError("n", n, "positive integer")
         
         if not self._data:
-            return "Empty DataFrame"
+            return DisplayFormatter("Empty DataFrame")
         
         # Get the first n rows
         rows_to_show = self._data[:n]
         
-        return self._format_rows(rows_to_show)
+        return DisplayFormatter(self._format_rows(rows_to_show))
     
-    def tail(self, n: int = 5) -> str:
+    def tail(self, n: int = 5) -> DisplayFormatter:
         """
         Display last n rows in a readable format.
         
@@ -91,7 +114,7 @@ class TempDataFrame:
             n: Number of rows to display (default: 5)
             
         Returns:
-            Formatted string representation of the last n rows
+            DisplayFormatter object with formatted representation of the last n rows
             
         Raises:
             ValidationError: If n is not a positive integer
@@ -104,12 +127,12 @@ class TempDataFrame:
             raise ValidationError("n", n, "positive integer")
         
         if not self._data:
-            return "Empty DataFrame"
+            return DisplayFormatter("Empty DataFrame")
         
         # Get the last n rows
         rows_to_show = self._data[-n:]
         
-        return self._format_rows(rows_to_show)
+        return DisplayFormatter(self._format_rows(rows_to_show))
     
     @property
     def shape(self) -> Tuple[int, int]:
@@ -131,15 +154,116 @@ class TempDataFrame:
         """
         return self._columns.copy()
     
-    def info(self) -> str:
+    def describe(self) -> DisplayFormatter:
+        """
+        Generate descriptive statistics for numeric columns.
+        
+        Returns:
+            DisplayFormatter object with statistical summary
+        """
+        if not self._data:
+            return DisplayFormatter("Empty DataFrame")
+        
+        # Find numeric columns
+        numeric_cols = []
+        for col in self._columns:
+            # Check if column contains numeric data
+            has_numeric = False
+            for row in self._data:
+                value = row.get(col)
+                if value is not None and isinstance(value, (int, float)) and not isinstance(value, bool):
+                    has_numeric = True
+                    break
+            if has_numeric:
+                numeric_cols.append(col)
+        
+        if not numeric_cols:
+            return DisplayFormatter("No numeric columns found")
+        
+        # Calculate statistics for each numeric column
+        stats = {}
+        for col in numeric_cols:
+            values = []
+            for row in self._data:
+                value = row.get(col)
+                if value is not None and isinstance(value, (int, float)) and not isinstance(value, bool):
+                    values.append(float(value))
+            
+            if values:
+                values.sort()
+                n = len(values)
+                
+                # Calculate statistics
+                count = n
+                mean = sum(values) / n
+                std = (sum((x - mean) ** 2 for x in values) / (n - 1)) ** 0.5 if n > 1 else 0.0
+                min_val = min(values)
+                max_val = max(values)
+                
+                # Percentiles
+                q25_idx = int(n * 0.25)
+                q50_idx = int(n * 0.50)
+                q75_idx = int(n * 0.75)
+                
+                q25 = values[q25_idx] if q25_idx < n else values[-1]
+                q50 = values[q50_idx] if q50_idx < n else values[-1]
+                q75 = values[q75_idx] if q75_idx < n else values[-1]
+                
+                stats[col] = {
+                    'count': count,
+                    'mean': mean,
+                    'std': std,
+                    'min': min_val,
+                    '25%': q25,
+                    '50%': q50,
+                    '75%': q75,
+                    'max': max_val
+                }
+        
+        if not stats:
+            return DisplayFormatter("No numeric data found")
+        
+        # Format output similar to pandas describe()
+        stat_names = ['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max']
+        
+        # Calculate column widths
+        col_widths = {}
+        for col in numeric_cols:
+            col_widths[col] = max(len(col), 10)  # Minimum width of 10
+        
+        # Create header
+        header_parts = [''.ljust(8)]  # Space for stat names
+        for col in numeric_cols:
+            header_parts.append(col.rjust(col_widths[col]))
+        
+        lines = ['  '.join(header_parts)]
+        
+        # Add statistics rows
+        for stat_name in stat_names:
+            row_parts = [stat_name.ljust(8)]
+            for col in numeric_cols:
+                if col in stats:
+                    value = stats[col][stat_name]
+                    if stat_name == 'count':
+                        formatted_value = f"{int(value)}"
+                    else:
+                        formatted_value = f"{value:.6f}"
+                    row_parts.append(formatted_value.rjust(col_widths[col]))
+                else:
+                    row_parts.append(''.rjust(col_widths[col]))
+            lines.append('  '.join(row_parts))
+        
+        return DisplayFormatter('\n'.join(lines))
+
+    def info(self) -> DisplayFormatter:
         """
         Display dataset information including column types and memory usage.
         
         Returns:
-            Formatted string with dataset information
+            DisplayFormatter object with dataset information
         """
         if not self._data:
-            return "Empty DataFrame"
+            return DisplayFormatter("Empty DataFrame")
         
         rows, cols = self.shape
         
@@ -190,7 +314,7 @@ class TempDataFrame:
         info_lines.append(f"dtypes: {self._get_dtype_counts()}")
         info_lines.append(f"memory usage: {memory_usage}")
         
-        return "\n".join(info_lines)
+        return DisplayFormatter("\n".join(info_lines))
     
     def to_csv(self, filename: str) -> None:
         """

@@ -33,7 +33,7 @@ Quick Example
 
    # Generate 1000 rows of sales data
    data = tempdataset.create_dataset('sales', 1000)
-   print(data.head())
+   data.head()
 
    # Save directly to CSV
    tempdataset.create_dataset('sales.csv', 500)

@@ -128,17 +128,19 @@ class TestEndToEndDatasetGeneration:
         
         # Verify data exploration methods work
         head_result = df.head()
-        assert isinstance(head_result, str)
-        assert len(head_result) > 0
+        from tempdataset.core.utils.data_frame import DisplayFormatter
+        assert isinstance(head_result, DisplayFormatter)
+        assert len(str(head_result)) > 0
         
         tail_result = df.tail()
-        assert isinstance(tail_result, str)
-        assert len(tail_result) > 0
+        assert isinstance(tail_result, DisplayFormatter)
+        assert len(str(tail_result)) > 0
         
         info_result = df.info()
-        assert isinstance(info_result, str)
-        assert "20 entries" in info_result
-        assert "30 columns" in info_result
+        assert isinstance(info_result, DisplayFormatter)
+        info_str = str(info_result)
+        assert "20 entries" in info_str
+        assert "30 columns" in info_str
     
     def test_different_row_counts_workflow(self):
         """Test workflow with different row counts."""
@@ -438,8 +440,9 @@ class TestErrorScenariosAndRecovery:
         
         # Test that methods still work with larger dataset
         head_result = df.head()
-        assert isinstance(head_result, str)
-        assert len(head_result) > 0
+        from tempdataset.core.utils.data_frame import DisplayFormatter
+        assert isinstance(head_result, DisplayFormatter)
+        assert len(str(head_result)) > 0
         
         info_result = df.info()
         assert "1000 entries" in info_result

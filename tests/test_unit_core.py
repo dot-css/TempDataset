@@ -49,17 +49,20 @@ class TestTempDataFrameBasics:
         
         # Test head
         head_result = df.head(2)
-        assert isinstance(head_result, str)
-        assert "Alice" in head_result
-        assert "Bob" in head_result
-        assert "Charlie" not in head_result
+        from tempdataset.core.utils.data_frame import DisplayFormatter
+        assert isinstance(head_result, DisplayFormatter)
+        head_str = str(head_result)
+        assert "Alice" in head_str
+        assert "Bob" in head_str
+        assert "Charlie" not in head_str
         
         # Test tail
         tail_result = df.tail(2)
-        assert isinstance(tail_result, str)
-        assert "Bob" in tail_result
-        assert "Charlie" in tail_result
-        assert "Alice" not in tail_result
+        assert isinstance(tail_result, DisplayFormatter)
+        tail_str = str(tail_result)
+        assert "Bob" in tail_str
+        assert "Charlie" in tail_str
+        assert "Alice" not in tail_str
     
     def test_info_method(self):
         """Test info() method."""
@@ -70,11 +73,13 @@ class TestTempDataFrameBasics:
         df = TempDataFrame(data, ["name", "age", "salary"])
         
         info_result = df.info()
-        assert isinstance(info_result, str)
-        assert "TempDataFrame" in info_result
-        assert "2 entries" in info_result
-        assert "3 columns" in info_result
-        assert "memory usage" in info_result
+        from tempdataset.core.utils.data_frame import DisplayFormatter
+        assert isinstance(info_result, DisplayFormatter)
+        info_str = str(info_result)
+        assert "TempDataFrame" in info_str
+        assert "2 entries" in info_str
+        assert "3 columns" in info_str
+        assert "memory usage" in info_str
     
     def test_empty_dataframe(self):
         """Test empty DataFrame behavior."""

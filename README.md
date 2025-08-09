@@ -34,7 +34,7 @@ import tempdataset
 
 # Generate 1000 rows of sales data
 data = tempdataset.create_dataset('sales', 1000)
-print(data.head())
+data.head()
 
 # Save directly to CSV
 tempdataset.create_dataset('sales.csv', 500)
@@ -76,10 +76,10 @@ print(f"Memory usage: {sales_data.memory_usage()}")
 data = tempdataset.create_dataset('sales', 1000)
 
 # Basic operations
-print(data.head(10))          # First 10 rows
-print(data.tail(5))           # Last 5 rows
-print(data.describe())        # Statistical summary
-print(data.info())            # Data info
+data.head(10)          # First 10 rows
+data.tail(5)           # Last 5 rows
+data.describe()        # Statistical summary
+data.info()            # Data info
 
 # Filtering and selection
 filtered = data.filter(lambda row: row['amount'] > 100)

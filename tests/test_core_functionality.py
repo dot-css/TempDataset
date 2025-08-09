@@ -93,36 +93,42 @@ class TestTempDataFrame:
     def test_head_default(self, temp_df):
         """Test head() method with default parameter."""
         result = temp_df.head()
-        assert isinstance(result, str)
-        assert "Alice" in result
-        assert "Bob" in result
-        assert "Charlie" in result
-        assert "Diana" in result
-        assert "Eve" in result  # All 5 rows should be shown
+        from tempdataset.core.utils.data_frame import DisplayFormatter
+        assert isinstance(result, DisplayFormatter)
+        result_str = str(result)
+        assert "Alice" in result_str
+        assert "Bob" in result_str
+        assert "Charlie" in result_str
+        assert "Diana" in result_str
+        assert "Eve" in result_str  # All 5 rows should be shown
     
     def test_head_with_n(self, temp_df):
         """Test head() method with specific n parameter."""
         result = temp_df.head(3)
-        assert isinstance(result, str)
-        assert "Alice" in result
-        assert "Bob" in result
-        assert "Charlie" in result
-        assert "Diana" not in result
-        assert "Eve" not in result
+        from tempdataset.core.utils.data_frame import DisplayFormatter
+        assert isinstance(result, DisplayFormatter)
+        result_str = str(result)
+        assert "Alice" in result_str
+        assert "Bob" in result_str
+        assert "Charlie" in result_str
+        assert "Diana" not in result_str
+        assert "Eve" not in result_str
     
     def test_head_larger_than_data(self, temp_df):
         """Test head() method with n larger than data size."""
         result = temp_df.head(10)
-        assert isinstance(result, str)
+        from tempdataset.core.utils.data_frame import DisplayFormatter
+        assert isinstance(result, DisplayFormatter)
+        result_str = str(result)
         # Should show all available rows
-        assert "Alice" in result
-        assert "Eve" in result
+        assert "Alice" in result_str
+        assert "Eve" in result_str
     
     def test_head_empty_dataframe(self):
         """Test head() method on empty DataFrame."""
         df = TempDataFrame([], ["col1", "col2"])
         result = df.head()
-        assert result == "Empty DataFrame"
+        assert str(result) == "Empty DataFrame"
     
     def test_head_invalid_n_type(self, temp_df):
         """Test head() method with invalid n type."""
@@ -146,36 +152,42 @@ class TestTempDataFrame:
     def test_tail_default(self, temp_df):
         """Test tail() method with default parameter."""
         result = temp_df.tail()
-        assert isinstance(result, str)
-        assert "Alice" in result
-        assert "Bob" in result
-        assert "Charlie" in result
-        assert "Diana" in result
-        assert "Eve" in result  # All 5 rows should be shown
+        from tempdataset.core.utils.data_frame import DisplayFormatter
+        assert isinstance(result, DisplayFormatter)
+        result_str = str(result)
+        assert "Alice" in result_str
+        assert "Bob" in result_str
+        assert "Charlie" in result_str
+        assert "Diana" in result_str
+        assert "Eve" in result_str  # All 5 rows should be shown
     
     def test_tail_with_n(self, temp_df):
         """Test tail() method with specific n parameter."""
         result = temp_df.tail(2)
-        assert isinstance(result, str)
-        assert "Diana" in result
-        assert "Eve" in result
-        assert "Alice" not in result
-        assert "Bob" not in result
-        assert "Charlie" not in result
+        from tempdataset.core.utils.data_frame import DisplayFormatter
+        assert isinstance(result, DisplayFormatter)
+        result_str = str(result)
+        assert "Diana" in result_str
+        assert "Eve" in result_str
+        assert "Alice" not in result_str
+        assert "Bob" not in result_str
+        assert "Charlie" not in result_str
     
     def test_tail_larger_than_data(self, temp_df):
         """Test tail() method with n larger than data size."""
         result = temp_df.tail(10)
-        assert isinstance(result, str)
+        from tempdataset.core.utils.data_frame import DisplayFormatter
+        assert isinstance(result, DisplayFormatter)
+        result_str = str(result)
         # Should show all available rows
-        assert "Alice" in result
-        assert "Eve" in result
+        assert "Alice" in result_str
+        assert "Eve" in result_str
     
     def test_tail_empty_dataframe(self):
         """Test tail() method on empty DataFrame."""
         df = TempDataFrame([], ["col1", "col2"])
         result = df.tail()
-        assert result == "Empty DataFrame"
+        assert str(result) == "Empty DataFrame"
     
     def test_tail_invalid_n_type(self, temp_df):
         """Test tail() method with invalid n type."""
@@ -222,24 +234,26 @@ class TestTempDataFrame:
     def test_info_method(self, temp_df):
         """Test info() method."""
         result = temp_df.info()
-        assert isinstance(result, str)
-        assert "TempDataFrame" in result
-        assert "5 entries" in result
-        assert "4 columns" in result
-        assert "name" in result
-        assert "age" in result
-        assert "city" in result
-        assert "salary" in result
-        assert "object" in result  # String columns
-        assert "int64" in result   # Integer columns
-        assert "float64" in result # Float columns
-        assert "memory usage" in result
+        from tempdataset.core.utils.data_frame import DisplayFormatter
+        assert isinstance(result, DisplayFormatter)
+        result_str = str(result)
+        assert "TempDataFrame" in result_str
+        assert "5 entries" in result_str
+        assert "4 columns" in result_str
+        assert "name" in result_str
+        assert "age" in result_str
+        assert "city" in result_str
+        assert "salary" in result_str
+        assert "object" in result_str  # String columns
+        assert "int64" in result_str   # Integer columns
+        assert "float64" in result_str # Float columns
+        assert "memory usage" in result_str
     
     def test_info_empty_dataframe(self):
         """Test info() method on empty DataFrame."""
         df = TempDataFrame([], ["col1", "col2"])
         result = df.info()
-        assert result == "Empty DataFrame"
+        assert str(result) == "Empty DataFrame"
     
     def test_info_with_null_values(self):
         """Test info() method with null values."""
@@ -250,9 +264,10 @@ class TestTempDataFrame:
         ]
         df = TempDataFrame(data, ["name", "age", "city"])
         result = df.info()
-        assert "2 non-null" in result  # name column has 2 non-null values
-        assert "2 non-null" in result  # age column has 2 non-null values
-        assert "2 non-null" in result  # city column has 2 non-null values
+        result_str = str(result)
+        assert "2 non-null" in result_str  # name column has 2 non-null values
+        assert "2 non-null" in result_str  # age column has 2 non-null values
+        assert "2 non-null" in result_str  # city column has 2 non-null values
 
 
 class TestTempDataFrameFileIO:

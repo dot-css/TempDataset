@@ -70,7 +70,7 @@ class DataGenerator:
         Generate dataset using registered generators.
         
         Args:
-            dataset_type: Dataset type ('sales') or filename ('sales.csv', 'sales.json')
+            dataset_type: Dataset type ('sales', 'customers') or filename ('sales.csv', 'customers.json')
             rows: Number of rows to generate
             
         Returns:
@@ -190,8 +190,23 @@ class DataGenerator:
                     rows=rows
                 ) from e
         
-        # For now, assume 'sales' dataset - will be expanded later
-        dataset_type = 'sales'
+        # Determine dataset type from filename
+        # Try to extract dataset type from filename base
+        dataset_type = None
+        
+        # First, try exact match with base filename
+        if base_name.lower() in self.datasets:
+            dataset_type = base_name.lower()
+        else:
+            # Try to find registered dataset types within the filename
+            for registered_type in self.datasets.keys():
+                if registered_type in base_name.lower():
+                    dataset_type = registered_type
+                    break
+            
+            # If still not found, default to sales for backward compatibility
+            if dataset_type is None:
+                dataset_type = 'sales'
         
         try:
             # Get optimization settings
@@ -268,7 +283,7 @@ class DataGenerator:
             TempDatasetMemoryError: If estimated memory usage is too high
         """
         # Estimate memory usage (rough calculation)
-        # Assume ~1KB per row for sales data (27 columns with mixed types)
+        # Assume ~1KB per row for typical datasets with mixed column types
         estimated_memory_mb = (rows * 1024) / (1024 * 1024)  # Convert to MB
         
         # Set reasonable limits

@@ -18,7 +18,7 @@ Generate In-Memory Dataset
    data = tempdataset.create_dataset('sales', 1000)
    
    # View the data
-   print(data.head())
+   data.head()
 
 Save to Files
 ~~~~~~~~~~~~~
@@ -50,10 +50,10 @@ Working with Data
    data = tempdataset.create_dataset('sales', 1000)
 
    # Basic operations
-   print(data.head(10))          # First 10 rows
-   print(data.tail(5))           # Last 5 rows
-   print(data.describe())        # Statistical summary
-   print(data.info())            # Data info
+   data.head(10)          # First 10 rows
+   data.tail(5)           # Last 5 rows
+   data.describe()        # Statistical summary
+   data.info()            # Data info
 
    # Export options
    data.to_csv('output.csv')
