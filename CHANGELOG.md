@@ -8,10 +8,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial release preparation
-- Complete test suite
-- Performance benchmarking
-- Documentation improvements
+- Future enhancements and features
+
+## [0.1.2] - 2025-01-10
+
+### Added
+- **NEW SOCIAL DATASETS**: Added 2 new social media datasets
+  - `social_media`: Social media posts with engagement metrics (17 columns)
+  - `user_profiles`: Social media user profiles with demographics (17 columns)
+- Enhanced CLI with comprehensive dataset listing (now 40 total datasets)
+- Complete test coverage for all 40 datasets
+- Improved CLI help text with categorized dataset listings
+
+### Fixed
+- Fixed CLI syntax errors and improved error handling
+- Enhanced dataset registration and validation
+
+### Changed
+- Updated CLI to display all 40 available datasets in organized categories
+- Improved dataset documentation and examples
+
+## [0.1.1] - 2025-01-XX
+
+### Added
+- Enhanced dataset collection with 38 datasets across multiple categories
+- Financial datasets (8): stocks, banking, cryptocurrency, insurance, loans, investments, accounting, payments
+- IoT sensor datasets (6): weather, energy, traffic, environmental, industrial, smarthome
+- Healthcare datasets (6): patients, appointments, lab_results, prescriptions, medical_history, clinical_trials
+- Technology datasets (8): web_analytics, app_usage, system_logs, api_calls, server_metrics, user_sessions, error_logs, performance
+- Core business datasets (10): crm, customers, ecommerce, employees, inventory, marketing, retail, reviews, sales, suppliers
 
 ## [0.1.0] - 2025-01-XX
 
