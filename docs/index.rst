@@ -18,13 +18,14 @@ A lightweight Python library for generating realistic temporary datasets for tes
 Features
 --------
 
-* **7 Comprehensive Datasets**: Sales, Customers, E-commerce, Employees, Marketing, Retail, and Suppliers
+* **40 Comprehensive Datasets**: Business, Financial, Technology, Healthcare, IoT Sensors, and Social Media  
+* **Technology Focus**: New datasets for DevOps monitoring, web analytics, and system performance
 * **Lightweight**: Zero dependencies for core functionality
 * **Multiple Formats**: Generate CSV, JSON, or in-memory datasets
 * **Realistic Data**: Built-in datasets with realistic patterns and relationships
 * **Extensible**: Easy to add custom dataset types
 * **Memory Efficient**: Optimized for large dataset generation
-* **Built-in Help**: Interactive help system with `tempdataset.help()`
+* **Built-in Help**: Interactive help system with `tempdataset.help()` and `tempdataset.list_datasets()`
 * **Python 3.7+**: Compatible with modern Python versions
 
 Quick Example

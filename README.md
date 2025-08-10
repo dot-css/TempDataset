@@ -4,18 +4,19 @@
 [![Python Support](https://img.shields.io/pypi/pyversions/tempdataset.svg)](https://pypi.org/project/tempdataset/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A lightweight Python library for generating realistic temporary datasets for testing and development. No heavy dependencies required - works with just the Python standard library!
+A lightweight Python library for generating realistic temporary datasets for testing and development. Generate **40+ different dataset types** including business, financial, IoT, healthcare, and technology data!
 
-## Features
+## ✨ Features
 
-- Lightweight: Zero dependencies for core functionality
-- Multiple Formats: Generate CSV, JSON, or in-memory datasets
-- Realistic Data: Built-in datasets with realistic patterns
-- Extensible: Easy to add custom dataset types
-- Memory Efficient: Optimized for large dataset generation
-- Python 3.7+: Compatible with modern Python versions
+- **40+ Dataset Types**: Business, financial, IoT sensors, healthcare, social media, and technology datasets
+- **Zero Dependencies**: Works with just Python standard library
+- **Multiple Formats**: Generate CSV, JSON, or in-memory datasets
+- **Realistic Data**: Built-in faker integration with realistic patterns
+- **Technology Focus**: New datasets for DevOps, monitoring, web analytics, and system performance
+- **Memory Efficient**: Optimized for large dataset generation
+- **Python 3.7+**: Compatible with modern Python versions
 
-## Quick Start
+## 🚀 Quick Start
 
 ### Installation
 
@@ -23,112 +24,94 @@ A lightweight Python library for generating realistic temporary datasets for tes
 pip install tempdataset
 ```
 
-```bash
-pip install git+https://github.com/dot-css/TempDataset
-```
-
 ### Basic Usage
 
 ```python
 import tempdataset
 
-# Generate 1000 rows of any dataset type
+# Generate datasets
 data = tempdataset.create_dataset('sales', 1000)
-data.head()
+tech_data = tempdataset.create_dataset('web_analytics', 500)
+server_metrics = tempdataset.create_dataset('server_metrics', 200)
 
-# Save directly to CSV
-tempdataset.create_dataset('sales.csv', 500)
+# Save directly to files
+tempdataset.create_dataset('sales_data.csv', 1000)
+tempdataset.create_dataset('api_logs.json', 500)
 
-# Save directly to JSON
-tempdataset.create_dataset('customers.json', 500)
-
-# Read data back
-csv_data = tempdataset.read_csv('sales.csv')
-json_data = tempdataset.read_json('customers.json')
-
-# Get help and see all available datasets
-tempdataset.help()          # Comprehensive help
-tempdataset.list_datasets() # Quick dataset overview
+# Get help and see all available datasets  
+tempdataset.list_datasets() # Show all 40+ datasets
+tempdataset.help()          # Quick help guide
+```
 ```
 
-## Available Datasets
+## 📊 Available Datasets (40 Total)
 
-TempDataset provides **7 comprehensive datasets** for various use cases:
+TempDataset provides **40 comprehensive datasets** across 6 major categories:
 
-### 🛒 Sales Dataset
-Complete sales transaction data with **27 columns**:
+### 🏢 Core Business Datasets (10)
+- **`sales`** - Sales transactions and orders (27 columns)
+- **`customers`** - Customer profiles and demographics (31 columns)  
+- **`ecommerce`** - E-commerce transactions and reviews (35+ columns)
+- **`employees`** - Employee records and HR data (30+ columns)
+- **`marketing`** - Marketing campaigns and performance (32+ columns)
+- **`retail`** - Retail store operations (28+ columns)
+- **`suppliers`** - Supplier management data (22+ columns)
+- **`crm`** - Customer relationship management (30+ columns)
+- **`inventory`** - Inventory and warehouse data (25+ columns)
+- **`reviews`** - Product and service reviews (15+ columns)
+
+### 💰 Financial Datasets (8)
+- **`stocks`** - Stock market trading data (20+ columns)
+- **`banking`** - Banking transactions (20+ columns)
+- **`cryptocurrency`** - Cryptocurrency trading (20+ columns)
+- **`insurance`** - Insurance policies and claims (20+ columns)
+- **`loans`** - Loan applications and management (20+ columns)
+- **`investments`** - Investment portfolios (20+ columns)
+- **`accounting`** - General ledger and accounting (20+ columns)
+- **`payments`** - Digital payment processing (25+ columns)
+
+### 🌐 Technology Datasets (8) ⭐ *NEW!*
+- **`web_analytics`** - Website analytics and traffic (17 columns)
+- **`app_usage`** - Mobile app usage analytics (15 columns)
+- **`system_logs`** - System and application logs (11 columns)
+- **`api_calls`** - API calls and performance (12 columns)
+- **`server_metrics`** - Server performance monitoring (22 columns)
+- **`user_sessions`** - User session tracking (20 columns)
+- **`error_logs`** - Application error logs (16 columns)
+- **`performance`** - Application performance monitoring (21 columns)
+
+### 🏥 Healthcare Datasets (6)
+- **`patients`** - Patient medical records (22 columns)
+- **`appointments`** - Medical appointments (14 columns)
+- **`lab_results`** - Laboratory test results (13 columns)
+- **`prescriptions`** - Medication prescriptions (16 columns)
+- **`medical_history`** - Patient medical history (11 columns)
+- **`clinical_trials`** - Clinical trial data (14 columns)
+
+### �️ IoT Sensor Datasets (6)  
+- **`weather`** - Weather sensor monitoring (18 columns)
+- **`energy`** - Smart meter energy data (14 columns)
+- **`traffic`** - Traffic sensor monitoring (15 columns)
+- **`environmental`** - Environmental monitoring (17 columns)
+- **`industrial`** - Industrial sensor data (16 columns)
+- **`smarthome`** - Smart home IoT devices (16 columns)
+
+### 📱 Social Media Datasets (2)
+- **`social_media`** - Social media posts and engagement (16 columns)
+- **`user_profiles`** - Social media user profiles (17 columns)
+
+### 🚀 Quick Examples
+
 ```python
-sales_data = tempdataset.create_dataset('sales', 1000)
-```
-**Features:** Order information, customer details, product data, financial calculations, geographic data, shipping details
+# Generate different types of datasets
+sales = tempdataset.create_dataset('sales', 1000)
+tech_logs = tempdataset.create_dataset('system_logs', 500)  
+health_data = tempdataset.create_dataset('patients', 200)
+crypto = tempdataset.create_dataset('cryptocurrency', 300)
 
-**Key Columns:** `order_id`, `customer_name`, `product_name`, `category`, `final_price`, `order_date`, `sales_rep`, `region`, `profit`
-
-### 👥 Customers Dataset  
-Comprehensive customer profiles with **31 columns**:
-```python
-customers_data = tempdataset.create_dataset('customers', 1000)
-```
-**Features:** Personal information, demographics, purchase history, loyalty data, account status, preferences
-
-**Key Columns:** `customer_id`, `full_name`, `email`, `age`, `annual_income`, `total_spent`, `loyalty_points`, `account_status`
-
-### 🛍️ E-commerce Dataset
-Advanced e-commerce transaction data with **35+ columns**:
-```python
-ecommerce_data = tempdataset.create_dataset('ecommerce', 1000)
-```
-**Features:** Transaction details, customer behavior, product catalog, reviews, returns, digital metrics, seller information
-
-**Key Columns:** `transaction_id`, `customer_rating`, `seller_rating`, `return_status`, `device_type`, `conversion_rate`
-
-### 👨‍💼 Employees Dataset
-Complete HR and employee management data with **30+ columns**:
-```python
-employees_data = tempdataset.create_dataset('employees', 1000)
-```
-**Features:** Personal info, job details, performance metrics, benefits, skills, department structure
-
-**Key Columns:** `employee_id`, `job_title`, `department`, `salary`, `performance_rating`, `benefits`, `skills`
-
-### 📢 Marketing Dataset
-Marketing campaign performance data with **32+ columns**:
-```python
-marketing_data = tempdataset.create_dataset('marketing', 1000)
-```
-**Features:** Campaign metrics, channel performance, ROI analysis, audience data, conversion tracking
-
-**Key Columns:** `campaign_id`, `channel`, `impressions`, `clicks`, `conversions`, `roi`, `cost_per_click`
-
-### 🏪 Retail Dataset
-In-store retail operations data with **28+ columns**:
-```python
-retail_data = tempdataset.create_dataset('retail', 1000)
-```
-**Features:** Point-of-sale transactions, inventory management, store operations, staff data, seasonal trends
-
-**Key Columns:** `receipt_id`, `store_id`, `product_sku`, `quantity_sold`, `staff_id`, `inventory_level`
-
-### 🏭 Suppliers Dataset
-Supplier and vendor management data with **22+ columns**:
-```python
-suppliers_data = tempdataset.create_dataset('suppliers', 1000)
-```
-**Features:** Supplier profiles, performance metrics, contract management, quality ratings, delivery data
-
-**Key Columns:** `supplier_id`, `company_name`, `quality_rating`, `delivery_performance`, `contract_value`
-
-### Quick Help
-```python
-# Get comprehensive help and examples
-tempdataset.help()
-
-# List all datasets with descriptions  
-tempdataset.list_datasets()
-
-# See specific dataset schema
-data = tempdataset.create_dataset('sales', 10)
-print(data.columns)  # View all column names
+# Get help and list all datasets
+tempdataset.list_datasets()  # Show all 40 datasets
+tempdataset.help()          # Quick reference guide
 ```
 
 ## Advanced Usage

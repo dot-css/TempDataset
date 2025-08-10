@@ -8,13 +8,51 @@ from .core.generator import DataGenerator
 from .core.utils.data_frame import TempDataFrame
 from .core.io.csv_handler import read_csv as _read_csv
 from .core.io.json_handler import read_json as _read_json
-from .core.datasets.sales import SalesDataset
+from .core.datasets.crm import CrmDataset
 from .core.datasets.customers import CustomersDataset
 from .core.datasets.ecommerce import EcommerceDataset
 from .core.datasets.employees import EmployeesDataset
+from .core.datasets.inventory import InventoryDataset
 from .core.datasets.marketing import MarketingDataset
 from .core.datasets.retail import RetailDataset
+from .core.datasets.reviews import ReviewsDataset
+from .core.datasets.sales import SalesDataset
 from .core.datasets.suppliers import SuppliersDataset
+# Financial datasets
+from .core.datasets.stocks import StocksDataset
+from .core.datasets.banking import BankingDataset
+from .core.datasets.cryptocurrency import CryptocurrencyDataset
+from .core.datasets.insurance import InsuranceDataset
+from .core.datasets.loans import LoansDataset
+from .core.datasets.investments import InvestmentsDataset
+from .core.datasets.accounting import AccountingDataset
+from .core.datasets.payments import PaymentsDataset
+# IoT Sensor datasets
+from .core.datasets.weather import WeatherDataset
+from .core.datasets.energy import EnergyDataset
+from .core.datasets.traffic import TrafficDataset
+from .core.datasets.environmental import EnvironmentalDataset
+from .core.datasets.industrial import IndustrialDataset
+from .core.datasets.smarthome import SmartHomeDataset
+# Healthcare datasets
+from .core.datasets.patients import PatientsDataset
+from .core.datasets.appointments import AppointmentsDataset
+from .core.datasets.lab_results import LabResultsDataset
+from .core.datasets.prescriptions import PrescriptionsDataset
+from .core.datasets.medical_history import MedicalHistoryDataset
+from .core.datasets.clinical_trials import ClinicalTrialsDataset
+# Social datasets
+from .core.datasets.social_media import SocialMediaDataset
+from .core.datasets.user_profiles import UserProfilesDataset
+# Technology datasets
+from .core.datasets.web_analytics import WebAnalyticsDataset
+from .core.datasets.app_usage import AppUsageDataset
+from .core.datasets.system_logs import SystemLogsDataset
+from .core.datasets.api_calls import ApiCallsDataset
+from .core.datasets.server_metrics import ServerMetricsDataset
+from .core.datasets.user_sessions import UserSessionsDataset
+from .core.datasets.error_logs import ErrorLogsDataset
+from .core.datasets.performance import PerformanceDataset
 from .core.exceptions import (
     TempDatasetError, DatasetNotFoundError, DataGenerationError,
     ValidationError, CSVReadError, CSVWriteError, JSONReadError, JSONWriteError,
@@ -25,20 +63,66 @@ from .core.exceptions import (
 _generator = DataGenerator()
 
 # Register available datasets
-_generator.register_dataset('sales', SalesDataset)
+_generator.register_dataset('crm', CrmDataset)
 _generator.register_dataset('customers', CustomersDataset)
 _generator.register_dataset('ecommerce', EcommerceDataset)
 _generator.register_dataset('employees', EmployeesDataset)
+_generator.register_dataset('inventory', InventoryDataset)
 _generator.register_dataset('marketing', MarketingDataset)
 _generator.register_dataset('retail', RetailDataset)
+_generator.register_dataset('reviews', ReviewsDataset)
+_generator.register_dataset('sales', SalesDataset)
 _generator.register_dataset('suppliers', SuppliersDataset)
+# Register financial datasets
+_generator.register_dataset('stocks', StocksDataset)
+_generator.register_dataset('banking', BankingDataset)
+_generator.register_dataset('cryptocurrency', CryptocurrencyDataset)
+_generator.register_dataset('insurance', InsuranceDataset)
+_generator.register_dataset('loans', LoansDataset)
+_generator.register_dataset('investments', InvestmentsDataset)
+_generator.register_dataset('accounting', AccountingDataset)
+_generator.register_dataset('payments', PaymentsDataset)
+# Register IoT sensor datasets
+_generator.register_dataset('weather', WeatherDataset)
+_generator.register_dataset('energy', EnergyDataset)
+_generator.register_dataset('traffic', TrafficDataset)
+_generator.register_dataset('environmental', EnvironmentalDataset)
+_generator.register_dataset('industrial', IndustrialDataset)
+_generator.register_dataset('smarthome', SmartHomeDataset)
+# Register healthcare datasets
+_generator.register_dataset('patients', PatientsDataset)
+_generator.register_dataset('appointments', AppointmentsDataset)
+_generator.register_dataset('lab_results', LabResultsDataset)
+_generator.register_dataset('prescriptions', PrescriptionsDataset)
+_generator.register_dataset('medical_history', MedicalHistoryDataset)
+_generator.register_dataset('clinical_trials', ClinicalTrialsDataset)
+# Register social datasets
+_generator.register_dataset('social_media', SocialMediaDataset)
+_generator.register_dataset('user_profiles', UserProfilesDataset)
+# Register technology datasets
+_generator.register_dataset('web_analytics', WebAnalyticsDataset)
+_generator.register_dataset('app_usage', AppUsageDataset)
+_generator.register_dataset('system_logs', SystemLogsDataset)
+_generator.register_dataset('api_calls', ApiCallsDataset)
+_generator.register_dataset('server_metrics', ServerMetricsDataset)
+_generator.register_dataset('user_sessions', UserSessionsDataset)
+_generator.register_dataset('error_logs', ErrorLogsDataset)
+_generator.register_dataset('performance', PerformanceDataset)
 
 def create_dataset(dataset_type: str, rows: int = 500):
     """
     Generate temporary datasets or save to files.
     
     Args:
-        dataset_type: Dataset type ('sales', 'customers', 'ecommerce', 'employees', 'marketing', 'retail', 'suppliers') or filename ('sales.csv', 'customers.json', 'ecommerce.json', 'employees.csv', 'marketing.csv', 'retail.csv', 'suppliers.csv')
+        dataset_type: Dataset type or filename
+            Available types: 'crm', 'customers', 'ecommerce', 'employees', 'inventory', 
+            'marketing', 'retail', 'reviews', 'sales', 'suppliers', 'stocks', 'banking', 
+            'cryptocurrency', 'insurance', 'loans', 'investments', 'accounting', 'payments',
+            'weather', 'energy', 'traffic', 'environmental', 'industrial', 'smarthome',
+            'patients', 'appointments', 'lab_results', 'prescriptions', 'medical_history', 'clinical_trials',
+            'social_media', 'user_profiles', 'web_analytics', 'app_usage', 'system_logs', 'api_calls', 
+            'server_metrics', 'user_sessions', 'error_logs', 'performance'
+            Or filename with extension: 'data.csv', 'data.json'
         rows: Number of rows to generate (default: 500)
         
     Returns:
@@ -112,13 +196,114 @@ def read_json(filename: str) -> TempDataFrame:
     return _read_json(filename)
 
 
-def get_performance_stats():
-    """
-    Get performance statistics from the data generator.
+def help():
+    """Display help information about TempDataset usage."""
+    print("""
+TempDataset - Generate Realistic Test Data
+==========================================
+
+Quick Examples:
+  import tempdataset
+  
+  # Generate datasets
+  data = tempdataset.create_dataset('sales', 1000)
+  customers = tempdataset.create_dataset('customers', 500)
+  
+  # Save to files
+  tempdataset.create_dataset('data.csv', 1000)
+  tempdataset.create_dataset('data.json', 500)
+
+Available Functions:
+  tempdataset.list_datasets()     - Show all available datasets
+  tempdataset.help()             - Show this help
+  tempdataset.create_dataset()   - Generate datasets
+
+For complete documentation: https://github.com/dot-css/TempDataset
+""")
+
+
+def list_datasets():
+    """List all available datasets with their names only."""
+    datasets = {
+        # Core Business (10)
+        'crm': 'Customer relationship management',
+        'customers': 'Customer profiles and demographics',
+        'ecommerce': 'E-commerce transactions', 
+        'employees': 'Employee records and HR data',
+        'inventory': 'Inventory and warehouse data',
+        'marketing': 'Marketing campaigns and metrics',
+        'retail': 'Retail store operations',
+        'reviews': 'Product and service reviews',
+        'sales': 'Sales transactions and orders',
+        'suppliers': 'Supplier management data',
+        
+        # Financial (8)
+        'stocks': 'Stock market trading data',
+        'banking': 'Banking transactions',
+        'cryptocurrency': 'Cryptocurrency trading',
+        'insurance': 'Insurance policies and claims',
+        'loans': 'Loan applications and management',
+        'investments': 'Investment portfolios',
+        'accounting': 'General ledger and accounting',
+        'payments': 'Digital payment processing',
+        
+        # IoT Sensors (6)
+        'weather': 'Weather sensor monitoring',
+        'energy': 'Smart meter energy data',
+        'traffic': 'Traffic sensor monitoring',
+        'environmental': 'Environmental monitoring',
+        'industrial': 'Industrial sensor data',
+        'smarthome': 'Smart home IoT devices',
+        
+        # Healthcare (6)
+        'patients': 'Patient medical records',
+        'appointments': 'Medical appointments',
+        'lab_results': 'Laboratory test results',
+        'prescriptions': 'Medication prescriptions',
+        'medical_history': 'Patient medical history',
+        'clinical_trials': 'Clinical trial data',
+        
+        # Social Media (2)
+        'social_media': 'Social media posts and engagement',
+        'user_profiles': 'Social media user profiles',
+        
+        # Technology (8)
+        'web_analytics': 'Website analytics and traffic',
+        'app_usage': 'Mobile app usage analytics',
+        'system_logs': 'System and application logs',
+        'api_calls': 'API calls and performance',
+        'server_metrics': 'Server performance monitoring',
+        'user_sessions': 'User session tracking',
+        'error_logs': 'Application error logs',
+        'performance': 'Application performance monitoring'
+    }
     
-    Returns:
-        Dictionary with performance statistics including timing and memory usage
-    """
+    print("\nTempDataset - Available Datasets")
+    print("=" * 40)
+    
+    categories = {
+        'Core Business (10)': ['crm', 'customers', 'ecommerce', 'employees', 'inventory', 'marketing', 'retail', 'reviews', 'sales', 'suppliers'],
+        'Financial (8)': ['stocks', 'banking', 'cryptocurrency', 'insurance', 'loans', 'investments', 'accounting', 'payments'],
+        'IoT Sensors (6)': ['weather', 'energy', 'traffic', 'environmental', 'industrial', 'smarthome'],
+        'Healthcare (6)': ['patients', 'appointments', 'lab_results', 'prescriptions', 'medical_history', 'clinical_trials'],
+        'Social Media (2)': ['social_media', 'user_profiles'],
+        'Technology (8)': ['web_analytics', 'app_usage', 'system_logs', 'api_calls', 'server_metrics', 'user_sessions', 'error_logs', 'performance']
+    }
+    
+    for category, dataset_names in categories.items():
+        print(f"\n{category}:")
+        for name in dataset_names:
+            print(f"  • {name:18} - {datasets[name]}")
+    
+    print(f"\nTotal: {len(datasets)} datasets available")
+    print("\nUsage: tempdataset.create_dataset('dataset_name', rows)")
+    print("Example: tempdataset.create_dataset('sales', 1000)")
+    
+    return list(datasets.keys())
+
+
+def get_performance_stats():
+    """Get performance statistics from the data generator."""
     return _generator.get_performance_stats()
 
 
@@ -128,236 +313,7 @@ def reset_performance_stats():
     _generator.profiler = _generator.profiler.__class__()
 
 
-def help():
-    """
-    Display comprehensive help information about available datasets and usage.
-    
-    This function provides detailed information about:
-    - All available datasets
-    - Column descriptions for each dataset
-    - Usage examples
-    - Quick start guide
-    """
-    help_text = """
-================================================================================
-                            TempDataset Library
-                     Generate Realistic Test Data with Ease
-================================================================================
-
-QUICK START
-================================================================================
-import tempdataset
-
-# Generate 1000 rows of any dataset
-data = tempdataset.create_dataset('sales', 1000)
-
-# Save directly to files
-tempdataset.create_dataset('customers.csv', 500)    # CSV format
-tempdataset.create_dataset('ecommerce.json', 200)   # JSON format
-
-# Read data back
-csv_data = tempdataset.read_csv('customers.csv')
-json_data = tempdataset.read_json('ecommerce.json')
-
-AVAILABLE DATASETS
-================================================================================
-
-SALES DATASET
--------------
-tempdataset.create_dataset('sales', rows)
-
-27 Columns: Complete sales transaction data
-• Order Info: order_id, dates, priority, sales_rep
-• Customer: customer_id, name, email, age, gender, segment
-• Product: product_id, name, category, subcategory, brand
-• Financial: prices, discounts, profit, payment_method
-• Geographic: region, country, state, city, postal_code
-• Logistics: shipping_mode, delivery dates
-
-CUSTOMERS DATASET
------------------
-tempdataset.create_dataset('customers', rows)
-
-31 Columns: Complete customer profiles
-• Personal: names, email, phone, demographics, birth_date
-• Professional: occupation, company, annual_income
-• Geographic: full address details with region
-• Account: creation date, status, purchase history
-• Loyalty: membership, points, preferences, newsletter
-• Analytics: total_orders, total_spent, average_order_value
-
-ECOMMERCE DATASET
------------------
-tempdataset.create_dataset('ecommerce', rows)
-
-35+ Columns: Comprehensive e-commerce transactions
-• Transaction: transaction_id, order details, timestamps
-• Customer: demographics, purchase behavior, device info
-• Product: detailed product catalog with variants
-• Business: pricing, margins, seller info, commissions
-• Reviews: ratings, review counts, return data
-• Digital: website sessions, mobile app usage
-
-EMPLOYEES DATASET
------------------
-tempdataset.create_dataset('employees', rows)
-
-30+ Columns: Complete employee records
-• Personal: names, contact, demographics, emergency contacts
-• Professional: job title, department, manager, salary
-• Employment: hire date, status, employment type
-• Performance: performance ratings, reviews, goals
-• Benefits: health insurance, retirement, PTO balances
-• Skills: skill ratings, certifications, training
-
-MARKETING DATASET
------------------
-tempdataset.create_dataset('marketing', rows)
-
-32+ Columns: Marketing campaign performance
-• Campaign: campaign_id, name, type, duration
-• Channels: email, social media, paid ads, content marketing
-• Performance: impressions, clicks, conversions, ROI
-• Audience: demographics, segments, engagement metrics
-• Budget: spend data, cost per acquisition, lifetime value
-• Attribution: touch points, conversion paths
-
-RETAIL DATASET
---------------
-tempdataset.create_dataset('retail', rows)
-
-28+ Columns: In-store retail operations
-• Transaction: receipt_id, timestamp, store info
-• Product: SKU, barcode, inventory levels
-• Sales: quantities, prices, discounts, tax
-• Store: store_id, location, staff info
-• Customer: demographics, loyalty cards
-• Operations: shift data, seasonal trends
-
-SUPPLIERS DATASET
------------------
-tempdataset.create_dataset('suppliers', rows)
-
-22+ Columns: Supplier and vendor management
-• Supplier: supplier_id, company name, contact details
-• Business: industry, size, years in business
-• Performance: quality ratings, delivery metrics
-• Financial: payment terms, credit ratings
-• Geographic: location data, service areas
-• Contracts: contract terms, certifications
-
-USAGE EXAMPLES
-================================================================================
-
-# Basic Usage
-data = tempdataset.create_dataset('sales', 1000)
-print(f"Generated {len(data)} rows with {len(data.columns)} columns")
-
-# Data Analysis
-high_value_sales = data.filter(lambda row: row['final_price'] > 500)
-customer_summary = data.select(['customer_name', 'final_price', 'order_date'])
-
-# Export Options
-data.to_csv('output.csv')          # Export to CSV
-data.to_json('output.json')        # Export to JSON
-dict_data = data.to_dict()          # Convert to dictionary
-
-# Direct File Generation
-tempdataset.create_dataset('sales_data.csv', 2000)        # Generate & save CSV
-tempdataset.create_dataset('customer_data.json', 1500)    # Generate & save JSON
-
-# Performance Monitoring
-stats = tempdataset.get_performance_stats()
-print(f"Generation time: {stats['generation_time']:.2f}s")
-print(f"Memory usage: {stats['memory_usage']:.2f}MB")
-
-# Data Operations
-data.head(10)           # First 10 rows
-data.tail(5)            # Last 5 rows
-data.describe()         # Statistical summary
-data.info()             # Data information
-data.memory_usage()     # Memory usage details
-
-TERMINAL USAGE
-================================================================================
-# Command-line interface (if installed as CLI)
-tempdataset sales -r 1000 --verbose
-tempdataset customers.csv -r 500
-tempdataset --list
-tempdataset --help-datasets
-
-MORE INFO
-================================================================================
-• Documentation: https://tempdataset.readthedocs.io/
-• GitHub: https://github.com/dot-css/TempDataset
-• Issues: https://github.com/dot-css/TempDataset/issues
-• License: MIT
-
-Version: 0.1.0 | Made with love for the Python testing community
-"""
-    print(help_text)
-
-
-def list_datasets():
-    """
-    List all available datasets with brief descriptions.
-    
-    Returns:
-        Dictionary with dataset names as keys and descriptions as values
-    """
-    datasets = {
-        'sales': {
-            'description': 'Sales transaction data with 27 columns',
-            'columns': 27,
-            'features': ['Order details', 'Customer info', 'Product data', 'Financial metrics', 'Geographic data']
-        },
-        'customers': {
-            'description': 'Customer profiles with 31 columns', 
-            'columns': 31,
-            'features': ['Personal info', 'Demographics', 'Purchase history', 'Loyalty data', 'Account details']
-        },
-        'ecommerce': {
-            'description': 'E-commerce transactions with 35+ columns',
-            'columns': 35,
-            'features': ['Transactions', 'Reviews', 'Digital metrics', 'Seller data', 'Device info']
-        },
-        'employees': {
-            'description': 'Employee records with 30+ columns',
-            'columns': 30,
-            'features': ['HR data', 'Performance metrics', 'Benefits', 'Skills', 'Department info']
-        },
-        'marketing': {
-            'description': 'Marketing campaign data with 32+ columns',
-            'columns': 32,
-            'features': ['Campaign metrics', 'Channel performance', 'ROI data', 'Audience analytics']
-        },
-        'retail': {
-            'description': 'Retail store operations with 28+ columns', 
-            'columns': 28,
-            'features': ['In-store transactions', 'Inventory', 'Store operations', 'Staff data']
-        },
-        'suppliers': {
-            'description': 'Supplier management data with 22+ columns',
-            'columns': 22, 
-            'features': ['Supplier profiles', 'Performance metrics', 'Contract data', 'Quality ratings']
-        }
-    }
-    
-    print("\nAvailable TempDataset Datasets")
-    print("=" * 50)
-    
-    for name, info in datasets.items():
-        print(f"\n• {name.upper()}")
-        print(f"   {info['description']}")
-        print(f"   Features: {', '.join(info['features'])}")
-        print(f"   Usage: tempdataset.create_dataset('{name}', rows)")
-    
-    print(f"\nUse tempdataset.help() for detailed examples and documentation")
-    
-    return datasets
-
-
-__version__ = "0.1.0"
+__version__ = "0.1.2"
 
 # Alias for convenience (matches the library name)
 tempdataset = create_dataset

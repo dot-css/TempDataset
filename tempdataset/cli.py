@@ -25,14 +25,59 @@ def main(args: Optional[list] = None) -> int:
         prog="tempdataset",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Available datasets:
-  sales      - Sales transaction data (27 columns)
-  customers  - Customer profiles (31 columns)  
-  ecommerce  - E-commerce transactions (35+ columns)
-  employees  - Employee records (30+ columns)
-  marketing  - Marketing campaigns (32+ columns)
-  retail     - Retail operations (28+ columns)
-  suppliers  - Supplier management (22+ columns)
+Available datasets (40 total):
+
+CORE BUSINESS:
+  crm           - Customer relationship management (30+ columns)
+  customers     - Customer profiles (31 columns)  
+  ecommerce     - E-commerce transactions (35+ columns)
+  employees     - Employee records (30+ columns)
+  inventory     - Inventory and warehouse stock (25+ columns)
+  marketing     - Marketing campaigns (32+ columns)
+  retail        - Retail operations (28+ columns)
+  reviews       - Product and service reviews (15+ columns)
+  sales         - Sales transaction data (27 columns)
+  suppliers     - Supplier management (22+ columns)
+
+FINANCIAL:
+  stocks        - Stock market trading data (20+ columns)
+  banking       - Banking transaction data (20+ columns)
+  cryptocurrency - Cryptocurrency trading data (20+ columns)
+  insurance     - Insurance policies and claims (20+ columns)
+  loans         - Loan applications and management (20+ columns)
+  investments   - Portfolio and investment tracking (20+ columns)
+  accounting    - General ledger and financial statements (20+ columns)
+  payments      - Digital payment processing (25+ columns)
+
+IOT SENSOR:
+  weather       - Weather sensor monitoring data (18 columns)
+  energy        - Smart meter energy monitoring (14 columns)
+  traffic       - Traffic sensor monitoring data (15 columns)
+  environmental - Environmental monitoring data (17 columns)
+  industrial    - Industrial sensor monitoring data (16 columns)
+  smarthome     - Smart home IoT device data (16 columns)
+
+HEALTHCARE:
+  patients      - Patient medical records (22 columns)
+  appointments  - Medical appointment scheduling (14 columns)
+  lab_results   - Laboratory test results (13 columns)
+  prescriptions - Medication prescriptions (16 columns)
+  medical_history - Patient medical history (11 columns)
+  clinical_trials - Clinical trial research data (14 columns)
+
+TECHNOLOGY:
+  web_analytics - Website analytics and traffic data (17 columns)
+  app_usage     - Mobile app usage analytics (15 columns)
+  system_logs   - System and application logs (11 columns)
+  api_calls     - API call logs and performance (12 columns)
+  server_metrics - Server performance monitoring (22 columns)
+  user_sessions - User session tracking (20 columns)
+  error_logs    - Application error logs (16 columns)
+  performance   - Application performance monitoring (21 columns)
+
+SOCIAL:
+  social_media  - Social media posts with engagement (16 columns)
+  user_profiles - Social media user profiles (17 columns)
 
 Examples:
   tempdataset sales -r 1000            # Generate 1000 sales records
