@@ -38,25 +38,70 @@ Quick Example
    # Get comprehensive help
    tempdataset.help()
    
-   # Generate any of the 7 available datasets
+   # Generate any of the 40 available datasets
    sales_data = tempdataset.create_dataset('sales', 1000)
    customers = tempdataset.create_dataset('customers', 500)
-   ecommerce = tempdataset.create_dataset('ecommerce', 800)
+   banking = tempdataset.create_dataset('banking', 800)
+   weather = tempdataset.create_dataset('weather', 1200)
 
    # Save directly to files
    tempdataset.create_dataset('employees.csv', 300)
-   tempdataset.create_dataset('marketing.json', 600)
+   tempdataset.create_dataset('web_analytics.json', 600)
 
-Available Datasets
+Dataset Categories
 ------------------
 
-* **Sales** (27 columns): Transaction data with order details, customer info, and financial metrics
-* **Customers** (31 columns): Customer profiles with demographics and purchase history  
-* **E-commerce** (35+ columns): Advanced transaction data with reviews and digital metrics
-* **Employees** (30+ columns): HR data with performance metrics and benefits
-* **Marketing** (32+ columns): Campaign data with ROI analysis and channel performance
-* **Retail** (28+ columns): In-store operations with inventory and staff data
-* **Suppliers** (22+ columns): Vendor management with quality ratings and contracts
+**Core Business (10 datasets)**
+* **CRM**: Customer relationship management data
+* **Customers**: Customer profiles and demographics  
+* **E-commerce**: E-commerce transactions and reviews
+* **Employees**: HR data with performance metrics
+* **Inventory**: Warehouse and inventory management
+* **Marketing**: Campaign data with ROI analysis
+* **Retail**: In-store operations and POS data
+* **Reviews**: Product and service reviews
+* **Sales**: Transaction data with order details
+* **Suppliers**: Vendor management and contracts
+
+**Financial (8 datasets)**
+* **Stocks**: Stock market trading data
+* **Banking**: Banking transactions and accounts
+* **Cryptocurrency**: Crypto trading and wallets
+* **Insurance**: Policies and claims processing
+* **Loans**: Loan applications and management
+* **Investments**: Investment portfolios and performance
+* **Accounting**: General ledger and financial records
+* **Payments**: Digital payment processing
+
+**IoT Sensors (6 datasets)**
+* **Weather**: Weather sensor monitoring
+* **Energy**: Smart meter energy consumption
+* **Traffic**: Traffic sensor and flow data
+* **Environmental**: Air quality and pollution monitoring
+* **Industrial**: Manufacturing sensor data
+* **Smart Home**: IoT device monitoring
+
+**Healthcare (6 datasets)**
+* **Patients**: Patient medical records
+* **Appointments**: Medical appointment scheduling
+* **Lab Results**: Laboratory test results
+* **Prescriptions**: Medication prescriptions
+* **Medical History**: Patient medical history
+* **Clinical Trials**: Clinical trial participant data
+
+**Social Media (2 datasets)**
+* **Social Media**: Posts, engagement, and metrics
+* **User Profiles**: Social media user profiles
+
+**Technology (8 datasets)**
+* **Web Analytics**: Website traffic and user behavior
+* **App Usage**: Mobile app usage analytics
+* **System Logs**: System and application logs
+* **API Calls**: API performance and usage
+* **Server Metrics**: Server performance monitoring
+* **User Sessions**: User session tracking
+* **Error Logs**: Application error tracking
+* **Performance**: Application performance monitoring
 
 Indices and tables
 ==================
