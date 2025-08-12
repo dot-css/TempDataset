@@ -313,7 +313,7 @@ def reset_performance_stats():
     _generator.profiler = _generator.profiler.__class__()
 
 
-__version__ = "0.1.2"
+__version__ = "0.2.0"
 
 # Alias for convenience (matches the library name)
 tempdataset = create_dataset

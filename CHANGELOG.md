@@ -10,6 +10,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Future enhancements and features
 
+## [0.2.0] - 2025-01-12
+
+### Fixed
+- **CRITICAL FIX**: Resolved datetime type mismatch error that was preventing generation of `user_profiles`, `suppliers`, `prescriptions`, and `insurance` datasets
+  - Fixed inconsistent return types between Faker and fallback date generation methods
+  - Updated `faker_utils.py` to ensure consistent `date` object returns
+  - All 40 datasets now generate successfully in both Colab and Kaggle environments
+- **API COMPATIBILITY**: Fixed `TempDataFrame.shape` to work both as property and method
+  - Users can now use both `df.shape` and `df.shape()` syntax
+  - Maintains backward compatibility with existing code
+  - Implemented custom descriptor for seamless property/method access
+
+### Changed
+- Enhanced error handling and type consistency across datetime operations
+- Improved cross-platform compatibility for environments with or without Faker library
+
+### Technical
+- Updated type annotations for better type safety
+- Enhanced fallback implementations for environments without optional dependencies
+- Improved test coverage for datetime edge cases
+
 ## [0.1.2] - 2025-01-10
 
 ### Added
