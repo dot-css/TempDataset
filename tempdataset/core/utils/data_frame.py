@@ -11,6 +11,51 @@ from typing import List, Dict, Any, Tuple, Union
 from ..exceptions import ValidationError, CSVWriteError, JSONWriteError
 
 
+class ShapeDescriptor:
+    """Custom descriptor that allows shape to work both as property and method."""
+    
+    def __get__(self, obj, objtype=None):
+        if obj is None:
+            return self
+        
+        # Create a callable object that returns the shape tuple
+        class ShapeCallable:
+            def __init__(self, data, columns):
+                self._data = data
+                self._columns = columns
+                self._shape = (len(data), len(columns))
+            
+            def __call__(self):
+                """Allow calling as method: df.shape()"""
+                return self._shape
+            
+            def __iter__(self):
+                """Allow tuple unpacking: rows, cols = df.shape"""
+                return iter(self._shape)
+            
+            def __getitem__(self, index):
+                """Allow indexing: df.shape[0], df.shape[1]"""
+                return self._shape[index]
+            
+            def __eq__(self, other):
+                """Allow comparison: df.shape == (10, 5)"""
+                return self._shape == other
+            
+            def __repr__(self):
+                """String representation"""
+                return repr(self._shape)
+            
+            def __str__(self):
+                """String representation"""
+                return str(self._shape)
+            
+            def __len__(self):
+                """Length (always 2 for shape tuple)"""
+                return 2
+        
+        return ShapeCallable(obj._data, obj._columns)
+
+
 class DisplayFormatter:
     """Helper class to format output for Jupyter/Colab display."""
     
@@ -152,15 +197,8 @@ class TempDataFrame:
         print(result.content)
         return result
     
-    @property
-    def shape(self) -> Tuple[int, int]:
-        """
-        Return (rows, columns) tuple.
-        
-        Returns:
-            Tuple containing number of rows and columns
-        """
-        return (len(self._data), len(self._columns))
+    # Use custom descriptor for shape to support both property and method access
+    shape = ShapeDescriptor()
     
     @property
     def columns(self) -> List[str]:
