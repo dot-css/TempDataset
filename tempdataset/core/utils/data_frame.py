@@ -152,16 +152,15 @@ class TempDataFrame:
         print(result.content)
         return result
     
+    @property
     def shape(self) -> Tuple[int, int]:
         """
-        Return (rows, columns) tuple as a method call.
+        Return (rows, columns) tuple.
         
         Returns:
             Tuple containing number of rows and columns
         """
-        result = (len(self._data), len(self._columns))
-        print(result)
-        return result
+        return (len(self._data), len(self._columns))
     
     @property
     def columns(self) -> List[str]:
@@ -288,7 +287,7 @@ class TempDataFrame:
         if not self._data:
             result = DisplayFormatter("Empty DataFrame")
         else:
-            rows, cols = self.shape()
+            rows, cols = self.shape
             
             # Calculate column types and non-null counts
             column_info = []

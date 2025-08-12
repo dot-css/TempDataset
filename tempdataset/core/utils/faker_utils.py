@@ -8,7 +8,7 @@ with fallback implementations when Faker is not available.
 import random
 import string
 from typing import Optional, List, Dict, Any, Callable
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 
 class FakerUtils:
@@ -199,7 +199,7 @@ class FakerUtils:
         else:
             return self._fallback_company()
     
-    def date_between(self, start_date: datetime, end_date: datetime) -> datetime:
+    def date_between(self, start_date: datetime, end_date: datetime) -> date:
         """
         Generate a random date between two dates.
         
@@ -208,7 +208,7 @@ class FakerUtils:
             end_date: End date
             
         Returns:
-            A random datetime between the specified dates
+            A random date between the specified dates
         """
         if self.faker_available:
             return self.faker.date_between(start_date=start_date, end_date=end_date)
@@ -263,12 +263,21 @@ class FakerUtils:
         else:
             return f"{random.choice(middle)} {random.choice(suffixes)}"
     
-    def _fallback_date_between(self, start_date: datetime, end_date: datetime) -> datetime:
+    def _fallback_date_between(self, start_date: datetime, end_date: datetime) -> date:
         """Generate a random date between two dates using fallback method."""
+        # Convert datetime inputs to date objects if needed
+        if isinstance(start_date, datetime):
+            start_date = start_date.date()
+        if isinstance(end_date, datetime):
+            end_date = end_date.date()
+        
         time_between = end_date - start_date
         days_between = time_between.days
         random_days = random.randint(0, days_between)
-        return start_date + timedelta(days=random_days)
+        result_date = start_date + timedelta(days=random_days)
+        
+        # Return a date object to match Faker's behavior
+        return result_date
     
     def _get_first_names(self) -> List[str]:
         """Get list of common first names for fallback."""
